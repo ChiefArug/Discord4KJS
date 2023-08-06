@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "discord4kjs",
+  "version": "${version}",
+  "name": "Discord4KJS",
+  "description": "Discord4J bindings for KubeJS. Create your own discord bots that run off Minecraft!",
+  "authors": [
+    "ChiefArug"
+  ],
+  "contact": {
+    "homepage": "//TODO"
+  },
+  "license": "LGPL-2.0",
+  "icon": "pack.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "chiefarug.mods.discord4kjs.fabric.Discord4KJSFabric"
+    ]
+  },
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.19.2",
+    "architectury": ">=6.5.77",
+    "kubejs": ">=6.1"
+  }
+}
