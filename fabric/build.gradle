@@ -30,9 +30,13 @@ dependencies {
 
     modImplementation("dev.latvian.mods:kubejs-fabric:${rootProject.kubejs_version}")
 
-    implementation "com.discord4j:discord4j-core:${discord4j_version}"
+    implementation("net.dv8tion:JDA:${jda_version}") {
+        exclude module: 'opus-java'
+    }
     loom {
-        include "com.discord4j:discord4j-core:${discord4j_version}"
+        include("net.dv8tion:JDA:${jda_version}") {
+            exclude module: 'opus-java'
+        }
     }
 }
 
