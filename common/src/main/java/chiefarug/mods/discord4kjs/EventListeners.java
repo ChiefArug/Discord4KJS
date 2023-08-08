@@ -1,5 +1,9 @@
 package chiefarug.mods.discord4kjs;
 
+import chiefarug.mods.discord4kjs.events.DisconnectEventJS;
+import chiefarug.mods.discord4kjs.events.MessageEditedEventJS;
+import chiefarug.mods.discord4kjs.events.MessageRecievedEventJS;
+import chiefarug.mods.discord4kjs.events.UserNameUpdateEventJS;
 import net.dv8tion.jda.api.events.ExceptionEvent;
 import net.dv8tion.jda.api.events.GatewayPingEvent;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -183,34 +187,32 @@ public class EventListeners extends ListenerAdapter {
 //	}
 
 	@Override
-	public void onShutdown(ShutdownEvent event) {
-		super.onShutdown(event);
-	}
+	public void onShutdown(ShutdownEvent event) { DiscordEvents.DISCONNECT.post(new DisconnectEventJS(event)); }
 
-	@Override
-	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-		super.onSlashCommandInteraction(event);
-	}
+//	@Override
+//	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+//		super.onSlashCommandInteraction(event);
+//	}
 
-	@Override
-	public void onUserContextInteraction(UserContextInteractionEvent event) {
-		super.onUserContextInteraction(event);
-	}
-
-	@Override
-	public void onMessageContextInteraction(MessageContextInteractionEvent event) {
-		super.onMessageContextInteraction(event);
-	}
+//	@Override
+//	public void onUserContextInteraction(UserContextInteractionEvent event) {
+//		super.onUserContextInteraction(event);
+//	}
+//
+//	@Override
+//	public void onMessageContextInteraction(MessageContextInteractionEvent event) {
+//		super.onMessageContextInteraction(event);
+//	}
 
 //	@Override
 //	public void onButtonInteraction(ButtonInteractionEvent event) {
 //		super.onButtonInteraction(event);
 //	}
 
-	@Override
-	public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
-		super.onCommandAutoCompleteInteraction(event);
-	}
+//	@Override
+//	public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
+//		super.onCommandAutoCompleteInteraction(event);
+//	}
 
 //	@Override
 //	public void onModalInteraction(ModalInteractionEvent event) {
@@ -227,60 +229,39 @@ public class EventListeners extends ListenerAdapter {
 //		super.onEntitySelectInteraction(event);
 //	}
 
-	@Override
-	public void onUserUpdateName(UserUpdateNameEvent event) {
-		super.onUserUpdateName(event);
-	}
+	// Name change events
+	public void onUserUpdateName(UserUpdateNameEvent event) { DiscordEvents.USER_NAME_UPDATE.post(new UserNameUpdateEventJS(event)); }
+	public void onUserUpdateGlobalName(UserUpdateGlobalNameEvent event) { DiscordEvents.USER_NAME_UPDATE.post(new UserNameUpdateEventJS(event)); }
+	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) { DiscordEvents.USER_NAME_UPDATE.post(new UserNameUpdateEventJS(event)); }
 
-	@Override
-	public void onUserUpdateGlobalName(UserUpdateGlobalNameEvent event) {
-		super.onUserUpdateGlobalName(event);
-	}
+	// We don't do presence events at the moment, cause ram usage go brrr
+//	@Override
+//	public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent event) { super.onUserUpdateOnlineStatus(event); }
+//	@Override
+//	public void onUserActivityStart(UserActivityStartEvent event) { super.onUserActivityStart(event); }
+//	@Override
+//	public void onUserActivityEnd(UserActivityEndEvent event) { super.onUserActivityEnd(event); }
+//	@Override
+//	public void onUserUpdateActivities(UserUpdateActivitiesEvent event) { super.onUserUpdateActivities(event); }
 
-	@Override
-	public void onUserUpdateAvatar(UserUpdateAvatarEvent event) {
-		super.onUserUpdateAvatar(event);
-	}
+	// This may cause too much traffic, so lets not for now
+//	@Override
+//	public void onUserTyping(UserTypingEvent event) {
+//		super.onUserTyping(event);
+//	}
 
-	@Override
-	public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent event) {
-		super.onUserUpdateOnlineStatus(event);
-	}
 
-	@Override
-	public void onUserTyping(UserTypingEvent event) {
-		super.onUserTyping(event);
-	}
-
-	@Override
-	public void onUserActivityStart(UserActivityStartEvent event) {
-		super.onUserActivityStart(event);
-	}
-
-	@Override
-	public void onUserActivityEnd(UserActivityEndEvent event) {
-		super.onUserActivityEnd(event);
-	}
-
-	@Override
-	public void onUserUpdateActivities(UserUpdateActivitiesEvent event) {
-		super.onUserUpdateActivities(event);
-	}
-
+	// Do we need internal use of this?
 //	@Override
 //	public void onSelfUpdateMFA(SelfUpdateMFAEvent event) {
 //		super.onSelfUpdateMFA(event);
 //	}
 
 	@Override
-	public void onMessageReceived(MessageReceivedEvent event) {
-		super.onMessageReceived(event);
-	}
+	public void onMessageReceived(MessageReceivedEvent event) { DiscordEvents.MESSAGE_RECIEVED.post(new MessageRecievedEventJS(event)); }
 
 	@Override
-	public void onMessageUpdate(MessageUpdateEvent event) {
-		super.onMessageUpdate(event);
-	}
+	public void onMessageUpdate(MessageUpdateEvent event) { DiscordEvents.MESSAGE_EDITED.post(new MessageEditedEventJS(event)); }
 
 	@Override
 	public void onMessageDelete(MessageDeleteEvent event) {
@@ -738,10 +719,6 @@ public class EventListeners extends ListenerAdapter {
 		super.onGuildMemberUpdate(event);
 	}
 
-	@Override
-	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) {
-		super.onGuildMemberUpdateNickname(event);
-	}
 
 	@Override
 	public void onGuildMemberUpdateAvatar(GuildMemberUpdateAvatarEvent event) {

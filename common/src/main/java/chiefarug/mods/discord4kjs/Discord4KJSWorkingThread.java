@@ -1,27 +1,24 @@
 package chiefarug.mods.discord4kjs;
 
 import com.google.common.base.Stopwatch;
-import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.internal.JDAImpl;
-import org.apache.commons.lang3.time.DurationFormatUtils;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
+import static chiefarug.mods.discord4kjs.Discord4KJS.CONSOLE;
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 
 public class Discord4KJSWorkingThread extends Thread {
 
 	public static boolean running;
-	private static ConsoleJS console = new ConsoleJS(ScriptType.STARTUP, LGGR);
 
 	public Discord4KJSWorkingThread() {
 		super("Discord4KJS working thread");
@@ -51,7 +48,7 @@ public class Discord4KJSWorkingThread extends Thread {
 	}
 
 	static ConsoleJS getConsole() {
-		return console;
+		return CONSOLE;
 	}
 
 
@@ -70,12 +67,14 @@ public class Discord4KJSWorkingThread extends Thread {
 		if (token.isEmpty()) return;
 
 		var loginTimer = Stopwatch.createStarted();
-		JDABuilder builder = JDABuilder.createDefault(token);
+		// todo move these intents to a config with default values
+		JDABuilder builder = JDABuilder.create(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_REACTIONS, GatewayIntent.GUILD_MEMBERS);
+		builder.setToken(token);
 		builder.setActivity(Activity.competing("the most jank Discord bot api setup"));
 		builder.addEventListeners(new EventListeners());
-		JDA jda = builder.build();
 
 		LGGR.info("Connecting to Discord...");
+		JDA jda = builder.build();
 		try {
 			jda.awaitReady();
 		} catch (InterruptedException e) {
@@ -99,7 +98,7 @@ public class Discord4KJSWorkingThread extends Thread {
 
 		try {
 			if (!jda.awaitShutdown(Duration.ofSeconds(10))) {
-				LGGR.warn("Wasn't able to disconnect nicely from Discord within 10 seconds, forcing shutdown immediately (this will skip the rate limit queue)");
+				LGGR.warn("Wasn't able to disconnect nicely from Discord within 10 seconds, forcing shutdown immediately (this will skip the any queued request!)");
 				jda.shutdownNow();
 			}
 			LGGR.info("Disconnected from Discord in {}", disconnectTimer.stop());
