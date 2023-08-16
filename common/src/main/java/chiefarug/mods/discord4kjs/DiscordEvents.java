@@ -3,15 +3,12 @@ package chiefarug.mods.discord4kjs;
 import chiefarug.mods.discord4kjs.events.BotReadyEventJS;
 import chiefarug.mods.discord4kjs.events.DisconnectEventJS;
 import chiefarug.mods.discord4kjs.events.DiscordEventJS;
-import chiefarug.mods.discord4kjs.events.MessageDeletedEventJS;
-import chiefarug.mods.discord4kjs.events.MessageEditedEventJS;
-import chiefarug.mods.discord4kjs.events.MessageRecievedEventJS;
+import chiefarug.mods.discord4kjs.events.message.MessageDeletedEventJS;
+import chiefarug.mods.discord4kjs.events.message.MessageEditedEventJS;
+import chiefarug.mods.discord4kjs.events.message.MessageRecievedEventJS;
 import chiefarug.mods.discord4kjs.events.UserNameUpdateEventJS;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
-import dev.latvian.mods.kubejs.script.ScriptType;
-import dev.latvian.mods.kubejs.script.ScriptTypeHolder;
-import dev.latvian.mods.kubejs.script.ScriptTypePredicate;
 
 public interface DiscordEvents {
 	EventGroup GROUP = EventGroup.of("DiscordEvents");

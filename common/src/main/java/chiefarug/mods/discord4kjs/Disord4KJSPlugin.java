@@ -45,6 +45,6 @@ public class Disord4KJSPlugin extends KubeJSPlugin {
 	}
 
 	private void startupBindings(BindingsEvent event) {
-		event.add("Discord4KJS", Discord4KJS.INSTANCE);
+		event.add("Discord", DiscordWrapper.class);
 	}
 }
