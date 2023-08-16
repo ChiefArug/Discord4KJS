@@ -3,8 +3,10 @@
   "minVersion": "0.8",
   "package": "chiefarug.mods.discord4kjs.mixin",
   "compatibilityLevel": "JAVA_17",
+  "verbose": true,
   "mixins": [
-    "ExtraThreadsShutdownMixin"
+    "ExtraThreadsShutdownMixin",
+    "annotations.JDA_HideFromJS"
   ],
   "injectors": {
     "defaultRequire": 1

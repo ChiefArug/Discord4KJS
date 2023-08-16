@@ -15,6 +15,5 @@ public class ExtraThreadsShutdownMixin {
 	@Inject(method = "shutdownExecutors", at = @At("RETURN"))
 	private static void shutdownExecutorsD4KJS(CallbackInfo ci) throws InterruptedException {
 		Discord4KJSWorkingThread.shutdown();
-		LGGR.info("Shutting down gracefully");
 	}
 }

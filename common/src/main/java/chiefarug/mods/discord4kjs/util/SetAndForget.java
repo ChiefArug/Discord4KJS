@@ -1,5 +1,7 @@
 package chiefarug.mods.discord4kjs.util;
 
+import dev.latvian.mods.rhino.util.HideFromJS;
+
 import java.util.function.Supplier;
 
 public class SetAndForget<T> implements Supplier<T> {

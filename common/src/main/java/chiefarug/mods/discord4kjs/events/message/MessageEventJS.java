@@ -12,9 +12,12 @@ import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.internal.entities.ReceivedMessage;
+import net.dv8tion.jda.internal.requests.restaction.MessageCreateActionImpl;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.CompletableFuture;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
 
@@ -95,17 +98,29 @@ public abstract class MessageEventJS extends DiscordEventJS {
 		return message.getJumpUrl();
 	}
 
+	@Info("Returns the user that wrote this message")
 	public User getAuthor() {
 		return message.getAuthor();
 	}
 
+	@Info("Returns if this bot send this message")
 	public boolean isOwnMessage() {
 		return getAuthor().equals(jda().getSelfUser());
 	}
 
+	//todo wrapper for messages so that things lke embeds can be passed in using a map like format
+	// might need own messagejs class to represent it
+	@Info("Replies to this message with a new message")
 	public void reply(String message) {
 		if (channel instanceof TextChannel textChannel) {
-			textChannel.sendMessage(new MessageCreateBuilder().addContent(message).mentionRepliedUser(true).build());
+			textChannel.sendMessage(message).setMessageReference(messageId).queue();
+		}
+	}
+
+	@Info("Sends a message in the same channel as this one")
+	public void sendMessage(String message) {
+		if (channel instanceof TextChannel textChannel) {
+			textChannel.sendMessage(message).queue();
 		}
 	}
 
