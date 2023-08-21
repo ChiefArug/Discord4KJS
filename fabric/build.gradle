@@ -19,6 +19,13 @@ configurations {
     developmentFabric.extendsFrom common
 }
 
+//fix IllegalStateException: trying to load net.fabricmc.loader.impl.FabricLoaderImpl from target class loader
+configurations.all {
+  resolutionStrategy {
+    force "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+  }
+}
+
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
