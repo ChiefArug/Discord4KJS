@@ -22,46 +22,41 @@ import java.util.List;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 
-@Mixin(JDAImpl.class)
+@Mixin(value = JDAImpl.class, remap = false)
 public abstract class JDA_HideFromJS {
 
-	@Shadow(remap = false)
+	@Shadow
 	//@HideFromJS //http client bad bad bad
 	@RemapForJS("beExtraNaughty")
 	public abstract OkHttpClient getHttpClient();
 
 
-	@Shadow(remap = false)
+	@Shadow
 	@HideFromJS // you shouldnt really be messing with event stuff either. if there is an event missing, raise an issue or pr it!
 	public abstract IEventManager getEventManager();
-	@Shadow(remap = false)
+	@Shadow
 	@HideFromJS
 	public abstract void setEventManager(IEventManager eventManager);
-	@Shadow(remap = false)
+	@Shadow
 	@HideFromJS
 	public abstract void addEventListener(Object... listeners);
-	@Shadow(remap = false)
+	@Shadow
 	@HideFromJS
 	public abstract void removeEventListener(Object... listeners);
-	@Shadow(remap = false)
+	@Shadow
 	@HideFromJS
 	public abstract List<Object> getRegisteredListeners();
 
 
-	@Shadow(remap = false)
+	@Shadow
 	@HideFromJS // this isn't particularly harmful afaict, but it still touches too close to networking for my liking
 	public abstract Requester getRequester();
 
-	@Shadow(remap = false)
+	@Shadow
 	@HideFromJS // no web sockets for you!
 	public abstract WebSocketFactory getWebSocketFactory();
-	@Shadow(remap = false)
+	@Shadow
 	@HideFromJS
 	public abstract WebSocketClient getClient();
-
-	@Inject(at = @At("HEAD"), method = "setSelfUser", remap = false)
-	public void randomMixin(CallbackInfo ci, SelfUser selfUser) {
-		LGGR.debug("Print from test mixin! Self user is now: " + selfUser);
-	}
 
 }
