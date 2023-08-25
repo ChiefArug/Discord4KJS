@@ -34,10 +34,10 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
     modImplementation("dev.latvian.mods:kubejs-forge:${rootProject.kubejs_version}")
-//    forgeRuntimeLibrary("net.dv8tion:JDA:${jda_version}") {
-//        exclude module: 'opus-java'
-//    }
-    forgeRuntimeLibrary shadowCommon("net.dv8tion:JDA:${jda_version}") {
+    forgeRuntimeLibrary("net.dv8tion:JDA:${jda_version}") {
+        exclude module: 'opus-java'
+    }
+    shadowCommon("net.dv8tion:JDA:${jda_version}") {
         exclude module: 'opus-java'
     }
 }
@@ -52,7 +52,14 @@ processResources {
 
 shadowJar {
 
-    relocate 'net.dv8tion.JDA', 'chiefarug.shadow.discord4kjs.JDA'
+    relocate 'net.dv8tion.jda', 'chiefarug.shadow.discord4kjs.jda'
+    relocate 'okhttp3', 'chiefarug.shadow.discord4kjs.okhhtp3'
+
+    exclude "com/**"
+    exclude "gnu/**"
+    exclude "kotlin/**"
+    exclude "org/**"
+    exclude "okio/**"
 
     exclude "fabric.mod.json"
     exclude "architectury.common.json"
