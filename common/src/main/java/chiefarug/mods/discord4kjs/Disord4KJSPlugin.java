@@ -33,7 +33,7 @@ public class Disord4KJSPlugin extends KubeJSPlugin {
 		filter.deny(JDA.class.getPackage().getName());
 		filter.deny(JDAImpl.class.getPackage().getName());
 		filter.deny(OkHttp.class.getPackage().getName());
-		filter.deny(WebSocket.class.getPackage().getName());
+		filter.deny(WebSocket.class.getPackage().getName()); //todo: check if i need to stop excluding this from the shadow jar
 	}
 
 	@Override

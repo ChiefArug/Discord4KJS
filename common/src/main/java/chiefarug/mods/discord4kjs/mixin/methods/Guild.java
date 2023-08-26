@@ -11,11 +11,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 @RemapPrefixForJS("d4kjs$")
-@Mixin(value = GuildImpl.class, remap = false)
-public abstract class Guild implements IGuildChannelContainer {
+@Mixin(value = net.dv8tion.jda.api.entities.Guild.class, remap = false)
+public interface Guild extends IGuildChannelContainer {
 
 	@Unique
-	public MessageChannel d4kjs$getChannel(ISnowflake snowflake) {
+	default MessageChannel d4kjs$getChannel(ISnowflake snowflake) {
 		return getChannelById(MessageChannel.class, snowflake.getIdLong());
 	}
 }
