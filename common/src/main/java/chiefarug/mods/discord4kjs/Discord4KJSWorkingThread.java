@@ -9,6 +9,8 @@ import java.time.Duration;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.CONSOLE;
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
+import static chiefarug.mods.discord4kjs.Discord4KJS.connectToDiscord;
+import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
 
 public class Discord4KJSWorkingThread extends Thread {
 
@@ -34,9 +36,21 @@ public class Discord4KJSWorkingThread extends Thread {
 
 	public static void shutdown() throws InterruptedException {
 		running = false;
-		//todo add config option, off by default, to sleep. So that we dont delay regular packs from shutting down
-		// if off maybe it could also just disable the thread checking, meaning that this thread can shutdown early... unless i can find some other use for it
-		Thread.sleep(500);
+
+		var disconnectTimer = Stopwatch.createStarted();
+		LGGR.info("Disconnecting from Discord");
+		jda().shutdown();
+
+		try {
+			if (!jda().awaitShutdown(Duration.ofMillis(Discord4KJSConfig.waitForShutdown))) {
+				LGGR.warn("Wasn't able to disconnect nicely from Discord within {}ms, forcing shutdown immediately (this will skip any queued requests!)", Discord4KJSConfig.waitForShutdown);
+				jda().shutdownNow();
+			} else {
+				LGGR.info("Disconnected from Discord in {}", disconnectTimer.stop());
+			}
+		} catch (InterruptedException e) {
+			LGGR.error("Error while waiting for JDA to shutdown", e);
+		}
 	}
 
 
@@ -56,21 +70,6 @@ public class Discord4KJSWorkingThread extends Thread {
 			} catch (InterruptedException e) {
 				LGGR.error("Discord4KJS working thread interrupted while sleeping", e);
 			}
-		}
-
-		var disconnectTimer = Stopwatch.createStarted();
-		LGGR.info("Disconnecting from Discord");
-		jda.shutdown();
-
-		try {
-			if (!jda.awaitShutdown(Duration.ofSeconds(10))) {
-				LGGR.warn("Wasn't able to disconnect nicely from Discord within 10 seconds, forcing shutdown immediately (this will skip the any queued requests!)");
-				jda.shutdownNow();
-				jda.awaitShutdown();
-			}
-			LGGR.info("Disconnected from Discord in {}", disconnectTimer.stop());
-		} catch (InterruptedException e) {
-			LGGR.error("Error while waiting for JDA to shutdown", e);
 		}
 	}
 }

@@ -1,10 +1,8 @@
 package chiefarug.mods.discord4kjs;
 
-import chiefarug.mods.discord4kjs.events.DisconnectEventJS;
-import chiefarug.mods.discord4kjs.events.message.MessageDeletedEventJS;
-import chiefarug.mods.discord4kjs.events.message.MessageEditedEventJS;
-import chiefarug.mods.discord4kjs.events.message.MessageRecievedEventJS;
-import chiefarug.mods.discord4kjs.events.UserNameUpdateEventJS;
+import dev.latvian.mods.kubejs.event.EventHandler;
+import dev.latvian.mods.kubejs.event.EventJS;
+import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.automod.AutoModExecutionEvent;
 import net.dv8tion.jda.api.events.automod.AutoModRuleCreateEvent;
 import net.dv8tion.jda.api.events.automod.AutoModRuleDeleteEvent;
@@ -90,12 +88,25 @@ import net.dv8tion.jda.api.events.user.update.UserUpdateGlobalNameEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
+import static chiefarug.mods.discord4kjs.DiscordEvents.*;
+
 public class EventListeners extends ListenerAdapter {
 
-	@Override
-	public void onReady(ReadyEvent event) {
-		super.onReady(event);
+	private void postWrappedEvent(EventHandler handler, GenericEvent event) {
+		if (handler.hasListeners()) {
+			EventJS eventJS;
+			try {
+				eventJS = handler.eventType.get().getConstructor(event.getClass()).newInstance(event);
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
+			handler.post(eventJS);
+		}
 	}
+
+	@Override
+	public void onReady(ReadyEvent event) { postWrappedEvent(READY, event); }
 
 //	@Override
 //	public void onSessionInvalidate(SessionInvalidateEvent event) {
@@ -123,7 +134,7 @@ public class EventListeners extends ListenerAdapter {
 //	}
 
 	@Override
-	public void onShutdown(ShutdownEvent event) { DiscordEvents.DISCONNECT.post(new DisconnectEventJS(event)); }
+	public void onShutdown(ShutdownEvent event) { postWrappedEvent(DISCONNECTED, event); }
 
 //	@Override
 //	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -166,9 +177,9 @@ public class EventListeners extends ListenerAdapter {
 //	}
 
 	// Name change events
-	public void onUserUpdateName(UserUpdateNameEvent event) { DiscordEvents.USER_NAME_UPDATE.post(new UserNameUpdateEventJS(event)); }
-	public void onUserUpdateGlobalName(UserUpdateGlobalNameEvent event) { DiscordEvents.USER_NAME_UPDATE.post(new UserNameUpdateEventJS(event)); }
-	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) { DiscordEvents.USER_NAME_UPDATE.post(new UserNameUpdateEventJS(event)); }
+	public void onUserUpdateName(UserUpdateNameEvent event) { postWrappedEvent(USER_NAME_UPDATE, event); }
+	public void onUserUpdateGlobalName(UserUpdateGlobalNameEvent event) { postWrappedEvent(USER_NAME_UPDATE, event); }
+	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) { postWrappedEvent(USER_NAME_UPDATE, event); }
 
 	// We don't do presence events at the moment, cause ram usage go brrr
 //	@Override
@@ -187,20 +198,16 @@ public class EventListeners extends ListenerAdapter {
 //	}
 
 
-	// Do we need internal use of this?
-//	@Override
-//	public void onSelfUpdateMFA(SelfUpdateMFAEvent event) {
-//		super.onSelfUpdateMFA(event);
-//	}
+
+	// Messages
+	@Override
+	public void onMessageReceived(MessageReceivedEvent event) { postWrappedEvent(MESSAGE_RECIEVED, event); }
 
 	@Override
-	public void onMessageReceived(MessageReceivedEvent event) { DiscordEvents.MESSAGE_RECIEVED.post(new MessageRecievedEventJS(event)); }
+	public void onMessageUpdate(MessageUpdateEvent event) { postWrappedEvent(MESSAGE_EDITED, event); }
 
 	@Override
-	public void onMessageUpdate(MessageUpdateEvent event) { DiscordEvents.MESSAGE_EDITED.post(new MessageEditedEventJS(event)); }
-
-	@Override
-	public void onMessageDelete(MessageDeleteEvent event) { DiscordEvents.MESSAGE_DELETED.post(new MessageDeletedEventJS(event)); }
+	public void onMessageDelete(MessageDeleteEvent event) { postWrappedEvent(MESSAGE_DELETED, event); }
 
 	@Override
 	public void onMessageBulkDelete(MessageBulkDeleteEvent event) {
@@ -415,6 +422,12 @@ public class EventListeners extends ListenerAdapter {
 
 	@Override
 	public void onGuildReady(GuildReadyEvent event) {
+		if (Discord4KJSConfig.autofillDefaultGuild) {
+			if (DiscordWrapper.defaultGuild != null)
+				DiscordWrapper.defaultGuild = event.getGuild();
+			else if (event.getJDA().getGuilds().size() > 1)
+				LGGR.warn("Discord4KJS is connected to more than one Discord Server! You should disable autofillDefaultGuild in {} to prevent the default guild changing between restarts", (Object) null/*TODO config file location*/);
+		}
 		super.onGuildReady(event);
 	}
 

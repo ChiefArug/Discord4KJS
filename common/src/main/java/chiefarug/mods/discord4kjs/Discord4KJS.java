@@ -40,7 +40,6 @@ public class Discord4KJS {
         return jda.get();
     }
 
-//    public static GatewayDiscordClient CLIENT;
 
     @HideFromJS
     public static void init() {
@@ -65,7 +64,7 @@ public class Discord4KJS {
 			if (token.isEmpty()) {
 				LGGR.warn("No valid token in Discord4KJS token file at {}. Discord4KJS will not load", TOKEN_PATH_DISPLAY);
 			} else if (token.length() < 59) {
-			   LGGR.error("The Discord bot token in {} seems to be invalid. Will attempt to start anyway, but this probably won't go well.", TOKEN_PATH_DISPLAY);
+				LGGR.error("The Discord bot token in {} seems to be invalid. Will attempt to start anyway, but this probably won't go well.", TOKEN_PATH_DISPLAY);
 			}
 			return token;
 		} catch (IOException e) {
@@ -78,8 +77,7 @@ public class Discord4KJS {
         String token = readToken();
 		if (token.isEmpty()) return null;
 
-		// todo move these intents to a config with default values
-		JDABuilder builder = JDABuilder.create(token, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_REACTIONS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES);
+		JDABuilder builder = JDABuilder.create(token, Discord4KJSConfig.intents);
 		builder.setActivity(Activity.competing("the most jank Discord bot api setup"));
 		builder.addEventListeners(new EventListeners());
 
@@ -96,13 +94,8 @@ public class Discord4KJS {
 			return;
 		}
 		LGGR.info("Connected to Discord in {}", loginTimer.stop());
+		connected = true;
 		Discord4KJS.jda.set(jda);
-
-		try {
-			LGGR.debug("annotations: " + JDAImpl.class.getMethod("getHttpClient").getDeclaredAnnotations().toString());
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 }

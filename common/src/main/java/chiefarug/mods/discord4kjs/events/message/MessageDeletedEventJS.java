@@ -15,6 +15,7 @@ public class MessageDeletedEventJS extends DiscordEventJS {
 	private final Channel channel;
 
 	public MessageDeletedEventJS(MessageDeleteEvent wrappedEvent) {
+		super(wrappedEvent);
 		this.messageId = wrappedEvent.getMessageId();
 		this.channel = wrappedEvent.getChannel();
 	}

@@ -10,6 +10,7 @@ public class BotReadyEventJS extends DiscordEventJS {
 	private final int disconnectedGuilds;
 
 	public BotReadyEventJS(ReadyEvent wrappedEvent) {
+		super(wrappedEvent);
 		this.connectedGuilds = wrappedEvent.getGuildAvailableCount();
 		this.disconnectedGuilds = wrappedEvent.getGuildUnavailableCount();
 	}

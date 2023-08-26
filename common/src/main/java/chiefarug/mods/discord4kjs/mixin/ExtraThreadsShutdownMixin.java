@@ -13,7 +13,7 @@ import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 @Mixin(Util.class)
 public class ExtraThreadsShutdownMixin {
 	@Inject(method = "shutdownExecutors", at = @At("RETURN"))
-	private static void shutdownExecutorsD4KJS(CallbackInfo ci) throws InterruptedException {
+	private static void discord4kjs$shutdownD4KJSWorkingThread(CallbackInfo ci) throws InterruptedException {
 		Discord4KJSWorkingThread.shutdown();
 	}
 }

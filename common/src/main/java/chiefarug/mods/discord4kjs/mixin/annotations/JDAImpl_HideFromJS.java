@@ -1,10 +1,7 @@
 package chiefarug.mods.discord4kjs.mixin.annotations;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
-import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import dev.latvian.mods.rhino.util.RemapForJS;
-import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.internal.JDAImpl;
 import net.dv8tion.jda.internal.requests.Requester;
@@ -12,24 +9,15 @@ import net.dv8tion.jda.internal.requests.WebSocketClient;
 import okhttp3.OkHttpClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.struct.InjectionInfo;
 
 import java.util.List;
 
-import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
-
 @Mixin(value = JDAImpl.class, remap = false)
-public abstract class JDA_HideFromJS {
+public abstract class JDAImpl_HideFromJS {
 
 	@Shadow
-	//@HideFromJS //http client bad bad bad
-	@RemapForJS("beExtraNaughty")
+	@HideFromJS
 	public abstract OkHttpClient getHttpClient();
-
 
 	@Shadow
 	@HideFromJS // you shouldnt really be messing with event stuff either. if there is an event missing, raise an issue or pr it!

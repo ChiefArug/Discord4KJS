@@ -9,15 +9,8 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import net.dv8tion.jda.internal.entities.ReceivedMessage;
-import net.dv8tion.jda.internal.requests.restaction.MessageCreateActionImpl;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.CompletableFuture;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
 
@@ -31,14 +24,12 @@ public abstract class MessageEventJS extends DiscordEventJS {
 	protected final Parser markdownParser = new Parser();
 	private Component cachedFormattedMesssage;
 
-	protected MessageEventJS(Message message, String messageId, Channel channel) {
-		this.message = message;
-		this.messageId = messageId;
-		this.channel = channel;
-	}
 	
 	protected MessageEventJS(Message message, GenericMessageEvent wrappedEvent) {
-		this(message, wrappedEvent.getMessageId(), wrappedEvent.getChannel());
+		super(wrappedEvent);
+		this.message = message;
+		this.messageId = wrappedEvent.getMessageId();
+		this.channel = wrappedEvent.getChannel();
 	}
 
 	@Info("Gets the message's id")

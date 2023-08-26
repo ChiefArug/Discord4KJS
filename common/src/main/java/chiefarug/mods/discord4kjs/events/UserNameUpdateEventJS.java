@@ -36,7 +36,7 @@ public class UserNameUpdateEventJS extends UserUpdateEventJS<String> {
 	}
 
 	public UserNameUpdateEventJS(GuildMemberUpdateNicknameEvent wrappedEvent) {
-		super(wrappedEvent.getUser(), wrappedEvent.getOldNickname(), wrappedEvent.getNewNickname());
+		super(wrappedEvent.getUser(), wrappedEvent.getOldNickname(), wrappedEvent.getNewNickname(), wrappedEvent);
 		this.type = NICKNAME;
 		this.server = wrappedEvent.getGuild();
 	}

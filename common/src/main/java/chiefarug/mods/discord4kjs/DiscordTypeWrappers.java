@@ -1,14 +1,23 @@
 package chiefarug.mods.discord4kjs;
 
 import dev.latvian.mods.kubejs.util.MapJS;
-import net.dv8tion.jda.api.OnlineStatus;
+import dev.latvian.mods.rhino.Context;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
-import net.dv8tion.jda.internal.utils.tuple.Pair;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
-import java.util.SplittableRandom;
 import java.util.regex.Matcher;
+
+import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
+import static chiefarug.mods.discord4kjs.Discord4KJS.connected;
+import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
+import static chiefarug.mods.discord4kjs.DiscordWrapper.defaultGuild;
 
 public class DiscordTypeWrappers {
 
@@ -18,7 +27,7 @@ public class DiscordTypeWrappers {
 	private static final String STREAMING = "streaming ";
 	private static final String COMPETING = "competing in ";
 
-	public static Activity activity(Object object) {
+	public static Activity activity(Context _c, Object object) {
 		if (object instanceof CharSequence cs) {
 			String activityString = cs.toString().toLowerCase(Locale.ROOT);
 			if (activityString.startsWith(PLAYING))
@@ -53,4 +62,73 @@ public class DiscordTypeWrappers {
 		return null;
 	}
 
+	public static Guild guild(Context _c, Object o) {
+		// we can't use jda() if not connected and typewrappers
+		// are likely to be used outside event blocks so we need to safeguard here
+		if (!connected) return gracefullyRefuse();
+
+		if (o instanceof Guild g) return g;
+		Long snowflake = asSnowflake(o);
+		if  (o != null) return jda().getGuildById(snowflake);
+		if (o instanceof CharSequence cs) return jda().getGuildsByName(cs.toString(), false).get(0);
+
+
+		return null;
+	}
+
+	public static User user(Context _c, Object o) {
+		// we can't use jda() if not connected and typewrappers
+		// are likely to be used outside event blocks so we need to safeguard here
+		if (!connected) return gracefullyRefuse();
+
+		if (o instanceof User u) return u;
+		Long snowflake = asSnowflake(o);
+		if  (o != null) return jda().getUserById(snowflake);
+		if (o instanceof CharSequence cs) return jda().getUsersByName(cs.toString(), false).get(0);
+
+		return null;
+	}
+
+	public static MessageChannel messageChannel(Context ctx, Object o) {
+		// we can't use jda() if not connected and typewrappers
+		// are likely to be used outside event blocks so we need to safeguard here
+		if (!connected) return gracefullyRefuse();
+
+		if (o instanceof MessageChannel c) return c;
+
+		Long snowflake = asSnowflake(o);
+
+		MessageChannel channel = jda().getChannelById(MessageChannel.class, snowflake);
+		if (channel != null) return channel;
+		// if its a user, use that users dms only if already open.
+		// if they arent open, ask for them to be opened only if we
+		// are allowed to block the thread (because that requires a request to discord)
+		User user = (User) ctx.getTypeWrappers().getWrapperFactory(User.class, o).wrap(ctx, o);
+		if (user != null) {
+			if (user.hasPrivateChannel()) return user.openPrivateChannel().complete();
+			if (Discord4KJSConfig.blockThread)
+				return user.openPrivateChannel().complete();
+		}
+
+		return null;
+	}
+
+	private static final double maxSafeDouble = 1L << 53;
+	private static Long asSnowflake(Object o) {
+		LGGR.debug(o.toString());
+		if (o instanceof Number n) {
+			if (!(n instanceof Long) && n.doubleValue() > maxSafeDouble)
+				LGGR.error("Cannot safely use raw numbers for Discord snowflake of about " + n.longValue() + " due to precision errors. Surround it in ' to convert it to a string");
+			return n.longValue();
+		}
+		if (o instanceof CharSequence cs) return Long.valueOf(cs.toString());
+		if (o instanceof ISnowflake is) return is.getIdLong();
+		return null;
+	}
+
+	@Nullable
+	private static <T> T gracefullyRefuse() {
+		LGGR.warn("Discord4KJS is not connected to Discord, gracefully refusing to typewrap! Consider using script headers to stop the script loading if not connected to Discord"); // todo: script headers
+		return null;
+	}
 }

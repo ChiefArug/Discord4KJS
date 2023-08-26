@@ -4,7 +4,13 @@ import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
+import dev.latvian.mods.rhino.util.wrap.TypeWrappers;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.JDAImpl;
 import net.minecraft.server.players.UserWhiteList;
 import okhttp3.OkHttp;
@@ -14,7 +20,7 @@ import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 public class Disord4KJSPlugin extends KubeJSPlugin {
 	@Override
 	public void init() {
-		LGGR.info("hello world");
+		LGGR.info("hello world"); //debug
 		DiscordEvents.GROUP.register();
 	}
 
@@ -25,31 +31,27 @@ public class Disord4KJSPlugin extends KubeJSPlugin {
 		filter.deny(JDAImpl.class.getPackage().getName());
 		filter.deny(OkHttp.class.getPackage().getName());
 	}
-	/*block list
-	net.dv8tion.jda.internal
-	okhttp3
-	net.dv8tion.jda.api.requests
-	 */
 
 	@Override
 	public void registerBindings(BindingsEvent event) {
 		switch (event.getType()) {
-			case STARTUP -> startupBindings(event);
 			case SERVER -> serverBindings(event);
 		}
 	}
 
-	private void serverBindings(BindingsEvent event) {
-		if (Discord4KJS.connected) {
+	@Override
+	public void registerTypeWrappers(ScriptType type, TypeWrappers event) {
+		event.register(Activity.class, DiscordTypeWrappers::activity);
+		event.register(Guild.class, DiscordTypeWrappers::guild);
+		event.register(User.class, DiscordTypeWrappers::user);
+		event.register(MessageChannel.class, DiscordTypeWrappers::messageChannel);
+	}
 
-		}
+	private void serverBindings(BindingsEvent event) {
+		event.add("Discord", DiscordWrapper.class);
 	}
 
 	@Override
 	public void registerEvents() {
-	}
-
-	private void startupBindings(BindingsEvent event) {
-		event.add("Discord", DiscordWrapper.class);
 	}
 }

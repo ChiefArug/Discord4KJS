@@ -6,7 +6,13 @@
   "verbose": true,
   "mixins": [
     "ExtraThreadsShutdownMixin",
-    "annotations.JDA_HideFromJS"
+
+    "annotations.JDAImpl_HideFromJS",
+    "annotations.IOUtil_HideFromJS",
+    "annotations.OkHttpClient$Builder_HideFromJS",
+    "annotations.Requester_HideFromJS",
+    "annotations.SessionConfig_HideFromJS",
+    "annotations.ShardingSessionConfig_HideFromJS"
   ],
   "injectors": {
     "defaultRequire": 1

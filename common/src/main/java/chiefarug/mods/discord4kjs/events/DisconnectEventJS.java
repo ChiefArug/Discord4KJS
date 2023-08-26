@@ -12,6 +12,7 @@ public class DisconnectEventJS extends DiscordEventJS {
 	private final CloseCode disconnectReason;
 
 	public DisconnectEventJS(ShutdownEvent wrappedEvent) {
+		super(wrappedEvent);
 		this.disconnectReason = wrappedEvent.getCloseCode();
 	}
 
