@@ -10,9 +10,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
+import static chiefarug.mods.discord4kjs.DiscordWrapper.defaultGuild;
+
 @RemapPrefixForJS("d4kjs$")
 @Mixin(value = net.dv8tion.jda.api.entities.Guild.class, remap = false)
-public interface Guild extends IGuildChannelContainer {
+public interface Guild extends IGuildChannelContainer, net.dv8tion.jda.api.entities.Guild {
+
+	@Unique
+	default boolean d4kjs$isDefault() {
+		return getIdLong() == defaultGuild.getIdLong();
+	}
 
 	@Unique
 	default MessageChannel d4kjs$getChannel(ISnowflake snowflake) {
