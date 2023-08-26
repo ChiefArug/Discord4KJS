@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Unique;
 
 @RemapPrefixForJS("d4kjs$")
 @Mixin(value = UserSnowflake.class, remap = false)
-public interface User extends ISnowflake {
+public interface User extends UserSnowflake {
 
 	@Unique
 	default boolean d4kjs$isSelf() {

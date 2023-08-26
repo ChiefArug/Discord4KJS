@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Unique;
 
 @RemapPrefixForJS("d4kjs$")
 @Mixin(value = net.dv8tion.jda.api.entities.channel.Channel.class, remap = false)
-public interface Channel extends IMentionable {
+public interface Channel extends net.dv8tion.jda.api.entities.channel.Channel {
 
 	@Shadow
 	ChannelType getType();

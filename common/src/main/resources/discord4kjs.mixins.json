@@ -15,7 +15,8 @@
     "annotations.ShardingSessionConfig_HideFromJS",
 
     "methods.Guild",
-    "methods.User"
+    "methods.User",
+    "methods.Channel"
   ],
   "injectors": {
     "defaultRequire": 1
