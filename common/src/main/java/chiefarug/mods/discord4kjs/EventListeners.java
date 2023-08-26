@@ -181,7 +181,7 @@ public class EventListeners extends ListenerAdapter {
 	public void onUserUpdateGlobalName(UserUpdateGlobalNameEvent event) { postWrappedEvent(USER_NAME_UPDATE, event); }
 	public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) { postWrappedEvent(USER_NAME_UPDATE, event); }
 
-	// We don't do presence events at the moment, cause ram usage go brrr
+	// We don't do presence events at the moment, cause ram and network usage go brrr
 //	@Override
 //	public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent event) { super.onUserUpdateOnlineStatus(event); }
 //	@Override
@@ -216,24 +216,14 @@ public class EventListeners extends ListenerAdapter {
 	public void onMessageEmbed(MessageEmbedEvent event) { postWrappedEvent(MESSAGE_EMBED_ADDED, event); }
 
 	@Override
-	public void onMessageReactionAdd(MessageReactionAddEvent event) {
-		super.onMessageReactionAdd(event);
-	}
-
+	public void onMessageReactionAdd(MessageReactionAddEvent event) { postWrappedEvent(REACTION_ADDED, event);}
 	@Override
-	public void onMessageReactionRemove(MessageReactionRemoveEvent event) {
-		super.onMessageReactionRemove(event);
-	}
+	public void onMessageReactionRemove(MessageReactionRemoveEvent event) { postWrappedEvent(REACTION_REMOVED, event);}
 
-	@Override
-	public void onMessageReactionRemoveAll(MessageReactionRemoveAllEvent event) {
-		super.onMessageReactionRemoveAll(event);
-	}
-
-	@Override
-	public void onMessageReactionRemoveEmoji(MessageReactionRemoveEmojiEvent event) {
-		super.onMessageReactionRemoveEmoji(event);
-	}
+//	@Override
+//	public void onMessageReactionRemoveAll(MessageReactionRemoveAllEvent event) {super.onMessageReactionRemoveAll(event);}
+//	@Override // maybe later
+//	public void onMessageReactionRemoveEmoji(MessageReactionRemoveEmojiEvent event) {super.onMessageReactionRemoveEmoji(event);}
 
 	@Override
 	public void onPermissionOverrideDelete(PermissionOverrideDeleteEvent event) {
@@ -250,126 +240,23 @@ public class EventListeners extends ListenerAdapter {
 		super.onPermissionOverrideCreate(event);
 	}
 
-	@Override
-	public void onStageInstanceDelete(StageInstanceDeleteEvent event) {
-		super.onStageInstanceDelete(event);
-	}
+//	@Override
+//	public void onStageInstanceDelete(StageInstanceDeleteEvent event) {super.onStageInstanceDelete(event);}
+//	@Override // maybe later
+//	public void onStageInstanceUpdateTopic(StageInstanceUpdateTopicEvent event) {super.onStageInstanceUpdateTopic(event);}
+//	@Override
+//	public void onStageInstanceUpdatePrivacyLevel(StageInstanceUpdatePrivacyLevelEvent event) {super.onStageInstanceUpdatePrivacyLevel(event);}
+//	@Override
+//	public void onStageInstanceCreate(StageInstanceCreateEvent event) {super.onStageInstanceCreate(event);}
 
 	@Override
-	public void onStageInstanceUpdateTopic(StageInstanceUpdateTopicEvent event) {
-		super.onStageInstanceUpdateTopic(event);
-	}
+	public void onChannelCreate(ChannelCreateEvent event) { postWrappedEvent(CHANNEL_CREATED, event); }
 
 	@Override
-	public void onStageInstanceUpdatePrivacyLevel(StageInstanceUpdatePrivacyLevelEvent event) {
-		super.onStageInstanceUpdatePrivacyLevel(event);
-	}
+	public void onChannelDelete(ChannelDeleteEvent event) { postWrappedEvent(CHANNEL_DELETED, event); }
 
 	@Override
-	public void onStageInstanceCreate(StageInstanceCreateEvent event) {
-		super.onStageInstanceCreate(event);
-	}
-
-	@Override
-	public void onChannelCreate(ChannelCreateEvent event) {
-		super.onChannelCreate(event);
-	}
-
-	@Override
-	public void onChannelDelete(ChannelDeleteEvent event) {
-		super.onChannelDelete(event);
-	}
-
-	// one generic channel update event?
-	@Override
-	public void onChannelUpdateName(ChannelUpdateNameEvent event) {
-		super.onChannelUpdateName(event);
-	}
-
-	@Override
-	public void onChannelUpdateFlags(ChannelUpdateFlagsEvent event) {
-		super.onChannelUpdateFlags(event);
-	}
-
-	@Override
-	public void onChannelUpdateNSFW(ChannelUpdateNSFWEvent event) {
-		super.onChannelUpdateNSFW(event);
-	}
-
-	@Override
-	public void onChannelUpdateParent(ChannelUpdateParentEvent event) {
-		super.onChannelUpdateParent(event);
-	}
-
-	@Override
-	public void onChannelUpdatePosition(ChannelUpdatePositionEvent event) {
-		super.onChannelUpdatePosition(event);
-	}
-
-	@Override
-	public void onChannelUpdateSlowmode(ChannelUpdateSlowmodeEvent event) {
-		super.onChannelUpdateSlowmode(event);
-	}
-
-	@Override
-	public void onChannelUpdateDefaultThreadSlowmode(ChannelUpdateDefaultThreadSlowmodeEvent event) {
-		super.onChannelUpdateDefaultThreadSlowmode(event);
-	}
-
-	@Override
-	public void onChannelUpdateDefaultReaction(ChannelUpdateDefaultReactionEvent event) {
-		super.onChannelUpdateDefaultReaction(event);
-	}
-
-	@Override
-	public void onChannelUpdateDefaultLayout(ChannelUpdateDefaultLayoutEvent event) {
-		super.onChannelUpdateDefaultLayout(event);
-	}
-
-	@Override
-	public void onChannelUpdateTopic(ChannelUpdateTopicEvent event) {
-		super.onChannelUpdateTopic(event);
-	}
-
-	@Override
-	public void onChannelUpdateType(ChannelUpdateTypeEvent event) {
-		super.onChannelUpdateType(event);
-	}
-
-	@Override
-	public void onChannelUpdateUserLimit(ChannelUpdateUserLimitEvent event) {
-		super.onChannelUpdateUserLimit(event);
-	}
-
-	@Override
-	public void onChannelUpdateArchived(ChannelUpdateArchivedEvent event) {
-		super.onChannelUpdateArchived(event);
-	}
-
-	@Override
-	public void onChannelUpdateArchiveTimestamp(ChannelUpdateArchiveTimestampEvent event) {
-		super.onChannelUpdateArchiveTimestamp(event);
-	}
-
-	@Override
-	public void onChannelUpdateAutoArchiveDuration(ChannelUpdateAutoArchiveDurationEvent event) {
-		super.onChannelUpdateAutoArchiveDuration(event);
-	}
-
-	@Override
-	public void onChannelUpdateLocked(ChannelUpdateLockedEvent event) {
-		super.onChannelUpdateLocked(event);
-	}
-
-	@Override
-	public void onChannelUpdateInvitable(ChannelUpdateInvitableEvent event) {
-		super.onChannelUpdateInvitable(event);
-	}
-
-	@Override
-	public void onChannelUpdateAppliedTags(ChannelUpdateAppliedTagsEvent event) {
-		super.onChannelUpdateAppliedTags(event);
-	}
+	public void onGenericChannelUpdate(GenericChannelUpdateEvent<?> event) { postWrappedEvent(CHANNEL_UPDATED, event); }
 
 	@Override
 	public void onForumTagAdd(ForumTagAddEvent event) {
@@ -424,7 +311,6 @@ public class EventListeners extends ListenerAdapter {
 			else if (event.getJDA().getGuilds().size() > 1)
 				LGGR.warn("Discord4KJS is connected to more than one Discord Server! You should disable autofillDefaultGuild in {} to prevent the default guild changing between restarts", (Object) null/*TODO config file location*/);
 		}
-		super.onGuildReady(event);
 	}
 
 	@Override
