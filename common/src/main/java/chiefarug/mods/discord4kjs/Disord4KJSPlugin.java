@@ -1,5 +1,6 @@
 package chiefarug.mods.discord4kjs;
 
+import com.neovisionaries.ws.client.WebSocket;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import dev.latvian.mods.kubejs.script.ScriptType;
@@ -8,10 +9,13 @@ import dev.latvian.mods.rhino.util.wrap.TypeWrappers;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.JDAImpl;
+import net.dv8tion.jda.internal.entities.UserSnowflakeImpl;
 import net.minecraft.server.players.UserWhiteList;
 import okhttp3.OkHttp;
 
@@ -20,7 +24,6 @@ import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 public class Disord4KJSPlugin extends KubeJSPlugin {
 	@Override
 	public void init() {
-		LGGR.info("hello world"); //debug
 		DiscordEvents.GROUP.register();
 	}
 
@@ -30,6 +33,7 @@ public class Disord4KJSPlugin extends KubeJSPlugin {
 		filter.deny(JDA.class.getPackage().getName());
 		filter.deny(JDAImpl.class.getPackage().getName());
 		filter.deny(OkHttp.class.getPackage().getName());
+		filter.deny(WebSocket.class.getPackage().getName());
 	}
 
 	@Override
@@ -45,6 +49,7 @@ public class Disord4KJSPlugin extends KubeJSPlugin {
 		event.register(Guild.class, DiscordTypeWrappers::guild);
 		event.register(User.class, DiscordTypeWrappers::user);
 		event.register(MessageChannel.class, DiscordTypeWrappers::messageChannel);
+		event.register(ISnowflake.class, DiscordTypeWrappers::snowflake);
 	}
 
 	private void serverBindings(BindingsEvent event) {

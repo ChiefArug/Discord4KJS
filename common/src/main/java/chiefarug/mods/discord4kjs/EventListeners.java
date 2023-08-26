@@ -210,14 +210,10 @@ public class EventListeners extends ListenerAdapter {
 	public void onMessageDelete(MessageDeleteEvent event) { postWrappedEvent(MESSAGE_DELETED, event); }
 
 	@Override
-	public void onMessageBulkDelete(MessageBulkDeleteEvent event) {
-		super.onMessageBulkDelete(event);
-	}
+	public void onMessageBulkDelete(MessageBulkDeleteEvent event) { postWrappedEvent(MESSAGES_BULK_DELETED, event); }
 
 	@Override
-	public void onMessageEmbed(MessageEmbedEvent event) {
-		super.onMessageEmbed(event);
-	}
+	public void onMessageEmbed(MessageEmbedEvent event) { postWrappedEvent(MESSAGE_EMBED_ADDED, event); }
 
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {

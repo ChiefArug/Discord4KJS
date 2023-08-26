@@ -113,6 +113,10 @@ public class DiscordTypeWrappers {
 		return null;
 	}
 
+	public static ISnowflake snowflake(Context _c, Object o) {
+		return () -> asSnowflake(o);
+	}
+
 	private static final double maxSafeDouble = 1L << 53;
 	private static Long asSnowflake(Object o) {
 		LGGR.debug(o.toString());

@@ -1,6 +1,5 @@
 package chiefarug.mods.discord4kjs.events.message;
 
-import chiefarug.mods.discord4kjs.events.DiscordEventJS;
 import chiefarug.mods.discord4kjs.markdown.Parser;
 import dev.latvian.mods.kubejs.typings.Info;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,27 +13,18 @@ import org.jetbrains.annotations.Nullable;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
 
-public abstract class MessageEventJS extends DiscordEventJS {
+public abstract class MessageEventJS extends ContentlessMessageEventJS {
 
 	@Nullable
 	protected final Message message;
-	protected final String messageId;
-	protected final Channel channel;
 
-	protected final Parser markdownParser = new Parser();
+	protected static final Parser markdownParser = new Parser();
 	private Component cachedFormattedMesssage;
 
 	
 	protected MessageEventJS(Message message, GenericMessageEvent wrappedEvent) {
 		super(wrappedEvent);
 		this.message = message;
-		this.messageId = wrappedEvent.getMessageId();
-		this.channel = wrappedEvent.getChannel();
-	}
-
-	@Info("Gets the message's id")
-	public String getMessageId() {
-		return messageId;
 	}
 
 	@Info("Returns the message as a Message object")
@@ -59,36 +49,6 @@ public abstract class MessageEventJS extends DiscordEventJS {
 		return cachedFormattedMesssage;
 	}
 
-	@Info("Gets the channel the message was in")
-	public Channel getChannel() {
-		return channel;
-	}
-
-	@Info("Gets the channel type (ie FORUM, THREAD, PRIVATE (dm) or TEXT")
-	public ChannelType getChannelType() {
-		return channel.getType();
-	}
-
-	@Info("Returns if the channel is PRIVATE, which means it is a dm (specifically the bots own dm with the message sender.")
-	public boolean isDm() {
-		return channel.getType() == ChannelType.PRIVATE;
-	}
-
-	@Info("Returns if the channel is in a guild, instead of being in the bots dms")
-	public boolean isGuildChannel() {
-		return channel.getType().isGuild();
-	}
-
-	@Info("Returns if the channel is in a thread in a guild")
-	public boolean isThread() {
-		return  channel.getType().isThread();
-	}
-
-	@Info("Gets the link to jump to this message")
-	public String getLink() {
-		return message.getJumpUrl();
-	}
-
 	@Info("Returns the user that wrote this message")
 	public User getAuthor() {
 		return message.getAuthor();
@@ -97,22 +57,6 @@ public abstract class MessageEventJS extends DiscordEventJS {
 	@Info("Returns if this bot send this message")
 	public boolean isOwnMessage() {
 		return getAuthor().equals(jda().getSelfUser());
-	}
-
-	//todo wrapper for messages so that things lke embeds can be passed in using a map like format
-	// might need own messagejs class to represent it
-	@Info("Replies to this message with a new message")
-	public void reply(String message) {
-		if (channel instanceof TextChannel textChannel) {
-			textChannel.sendMessage(message).setMessageReference(messageId).queue();
-		}
-	}
-
-	@Info("Sends a message in the same channel as this one")
-	public void sendMessage(String message) {
-		if (channel instanceof TextChannel textChannel) {
-			textChannel.sendMessage(message).queue();
-		}
 	}
 
 }

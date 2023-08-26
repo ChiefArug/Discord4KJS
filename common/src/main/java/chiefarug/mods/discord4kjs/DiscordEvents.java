@@ -3,8 +3,10 @@ package chiefarug.mods.discord4kjs;
 import chiefarug.mods.discord4kjs.events.BotReadyEventJS;
 import chiefarug.mods.discord4kjs.events.DisconnectEventJS;
 import chiefarug.mods.discord4kjs.events.DiscordEventJS;
+import chiefarug.mods.discord4kjs.events.message.MessageBulkDeletedEventJS;
 import chiefarug.mods.discord4kjs.events.message.MessageDeletedEventJS;
 import chiefarug.mods.discord4kjs.events.message.MessageEditedEventJS;
+import chiefarug.mods.discord4kjs.events.message.MessageEmbedAddedEventJS;
 import chiefarug.mods.discord4kjs.events.message.MessageRecievedEventJS;
 import chiefarug.mods.discord4kjs.events.UserNameUpdateEventJS;
 import dev.latvian.mods.kubejs.event.EventGroup;
@@ -31,6 +33,9 @@ public interface DiscordEvents {
 	EventHandler MESSAGE_RECIEVED = event("messageRecieved", MessageRecievedEventJS.class);
 	EventHandler MESSAGE_EDITED = event("messageEdited", MessageEditedEventJS.class);
 	EventHandler MESSAGE_DELETED = event("messageDeleted", MessageDeletedEventJS.class);
+	EventHandler MESSAGES_BULK_DELETED = event("bulkMessagesDeleted", MessageBulkDeletedEventJS.class);
+	EventHandler MESSAGE_EMBED_ADDED = event("messageEmbedAdded", MessageEmbedAddedEventJS.class);
+
 
 
 }

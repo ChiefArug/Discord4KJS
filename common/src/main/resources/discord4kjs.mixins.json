@@ -12,7 +12,10 @@
     "annotations.OkHttpClient$Builder_HideFromJS",
     "annotations.Requester_HideFromJS",
     "annotations.SessionConfig_HideFromJS",
-    "annotations.ShardingSessionConfig_HideFromJS"
+    "annotations.ShardingSessionConfig_HideFromJS",
+
+    "methods.Guild",
+    "methods.User"
   ],
   "injectors": {
     "defaultRequire": 1

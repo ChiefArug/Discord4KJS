@@ -12,8 +12,10 @@ import dev.latvian.mods.rhino.util.HideFromJS;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.internal.JDAImpl;
+import net.dv8tion.jda.internal.utils.Helpers;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -22,6 +24,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+
+import static net.dv8tion.jda.api.utils.MemberCachePolicy.ALL;
 
 public class Discord4KJS {
 
@@ -78,8 +82,9 @@ public class Discord4KJS {
 		if (token.isEmpty()) return null;
 
 		JDABuilder builder = JDABuilder.create(token, Discord4KJSConfig.intents);
-		builder.setActivity(Activity.competing("the most jank Discord bot api setup"));
+		builder.setActivity(Activity.competing("the most jank Discord bot api setup")); // config?
 		builder.addEventListeners(new EventListeners());
+		builder.setMemberCachePolicy(ALL); //todo make this a config option
 
 		return builder.build();
 	}
@@ -96,6 +101,10 @@ public class Discord4KJS {
 		LGGR.info("Connected to Discord in {}", loginTimer.stop());
 		connected = true;
 		Discord4KJS.jda.set(jda);
+	}
+
+	public static String getJumpUrl(String messageId, String channelId, String guildId) {
+		return Helpers.format(Message.JUMP_URL, guildId != null ?guildId : "@me", channelId, messageId);
 	}
 
 }

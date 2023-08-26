@@ -7,6 +7,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 //TODO: actually implement this
+//TODO: config option to not send certain events if the bot is the sender?
 public class Discord4KJSConfig {
 
 	// If the thread is allowed to be blocked to wait for requests to discord to complete.
