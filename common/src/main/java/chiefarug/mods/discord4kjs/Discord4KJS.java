@@ -77,7 +77,7 @@ public class Discord4KJS {
 		return token;
 	}
 
-    static JDA buildJDA() {
+    static JDABuilder buildJDA() {
         String token = readToken();
 		if (token.isEmpty()) return null;
 
@@ -86,12 +86,13 @@ public class Discord4KJS {
 		builder.addEventListeners(new EventListeners());
 		builder.setMemberCachePolicy(ALL); //todo make this a config option
 
-		return builder.build();
+		return builder;
 	}
 
-    static void connectToDiscord(JDA jda) {
-		LGGR.info("Connecting to Discord...");
+    static void connectToDiscord(JDABuilder jdab) {
 		var loginTimer = Stopwatch.createStarted();
+		LGGR.info("Connecting to Discord...");
+		JDA jda = jdab.build();
 		try {
 			jda.awaitReady();
 		} catch (InterruptedException e) {

@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
 
 import java.time.Duration;
 
@@ -58,7 +59,7 @@ public class Discord4KJSWorkingThread extends Thread {
 	public void run() {
 		running = true;
 
-		JDA jda = Discord4KJS.buildJDA();
+		JDABuilder jda = Discord4KJS.buildJDA();
 		if (jda == null) return;
 
 		Discord4KJS.connectToDiscord(jda);
