@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.UUID;
 
 //TODO: Clean up leftovers from MarkCraft. Rewrite completely?
-//TODO: Implement the reverse: components to markdown. *fun*
 public class Parser {
 
 	static final String emojiCharacters = ":";

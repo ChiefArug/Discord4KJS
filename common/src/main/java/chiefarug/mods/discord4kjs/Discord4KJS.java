@@ -1,6 +1,7 @@
 package chiefarug.mods.discord4kjs;
 
 import chiefarug.mods.discord4kjs.markdown.Parser;
+import chiefarug.mods.discord4kjs.markdown.Unparser;
 import chiefarug.mods.discord4kjs.util.SetAndForget;
 import com.google.common.base.Stopwatch;
 import com.mojang.logging.LogUtils;
@@ -34,7 +35,8 @@ public class Discord4KJS {
     public static final String MOD_ID = "discord4kjs";
     public static final Logger LGGR = LogUtils.getLogger();
     public transient static ConsoleJS CONSOLE = new ConsoleJS(ScriptType.SERVER, LGGR);
-    private transient static Parser markdownParser = new Parser();
+    private static Parser markdownParser = new Parser();
+	private static Unparser markdownUnparser = new Unparser();
     static final SetAndForget<JDA> jda = new SetAndForget<>();
 
 	public static boolean isConnected() {
@@ -55,6 +57,10 @@ public class Discord4KJS {
     public static Component parseMarkdown(String stringWithMarkdown) {
         return markdownParser.setText(stringWithMarkdown).parse();
     }
+
+	public static String unparseMarkdown(Component styledComponent) {
+		return markdownUnparser.setComponent(styledComponent).unparse();
+	}
 
     @NotNull
 	private static String readToken() {

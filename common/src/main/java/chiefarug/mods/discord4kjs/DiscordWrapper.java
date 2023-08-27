@@ -69,6 +69,11 @@ public class DiscordWrapper {
 		return Discord4KJS.parseMarkdown(text);
 	}
 
+	@Info("Turns the input component into a string with discords markdown characters in it so the text should look the same in both applications")
+	public static String unparseMarkdown(Component text) {
+		return Discord4KJS.unparseMarkdown(text);
+	}
+
 	@Info("Gets a mention for the bot, as a string in the format '<@id>' (which Discord will display as a mention)")
 	public static String getSelfMention() {
 		return getSelf().getAsMention();
