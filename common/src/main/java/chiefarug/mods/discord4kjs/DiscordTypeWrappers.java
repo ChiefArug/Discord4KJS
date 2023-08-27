@@ -6,9 +6,10 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -81,7 +82,9 @@ public class DiscordTypeWrappers {
 		// are likely to be used outside event blocks so we need to safeguard here
 		if (!connected) return gracefullyRefuse();
 
-		if (o instanceof User u) return u;
+		if (o instanceof User u) {
+			return tryMember(u);
+		}
 		Long snowflake = asSnowflake(o);
 		if  (o != null) return jda().getUserById(snowflake);
 		if (o instanceof CharSequence cs) return jda().getUsersByName(cs.toString(), false).get(0);
@@ -122,12 +125,31 @@ public class DiscordTypeWrappers {
 		LGGR.debug(o.toString());
 		if (o instanceof Number n) {
 			if (!(n instanceof Long) && n.doubleValue() > maxSafeDouble)
-				LGGR.error("Cannot safely use raw numbers for Discord snowflake of about " + n.longValue() + " due to precision errors. Surround it in ' to convert it to a string");
+				LGGR.error("Cannot safely use raw numbers for Discord snowflake of about " + n.longValue() + " due to number precision errors. Surround it in ' to convert it to a string");
 			return n.longValue();
 		}
 		if (o instanceof CharSequence cs) return Long.valueOf(cs.toString());
 		if (o instanceof ISnowflake is) return is.getIdLong();
 		return null;
+	}
+
+	// Helper method to try and convert a User to a Member of the specified Guild.
+	// We mixin so that Member extends User, so that no funtionality is lost for scripters,
+	// who don't have to worry about casting and just see the base object
+	@NotNull
+	public static User tryMember(@NotNull User user, @Nullable Guild guild) {
+		Member m = null;
+		if (guild != null) {
+			m = guild.getMember(user);
+		}
+		if (m != null) return (User) m;
+		return user;
+	}
+
+	@NotNull
+	public static User tryMember(@NotNull User user) {
+		if (defaultGuild == null) return user;
+		return tryMember(user, defaultGuild);
 	}
 
 	@Nullable

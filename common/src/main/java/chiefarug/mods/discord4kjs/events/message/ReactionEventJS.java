@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 
+import static chiefarug.mods.discord4kjs.DiscordTypeWrappers.tryMember;
+
 public abstract class ReactionEventJS extends ContentlessMessageEventJS {
 
 	protected final MessageReaction reaction;
@@ -19,7 +21,7 @@ public abstract class ReactionEventJS extends ContentlessMessageEventJS {
 		super(wrappedEvent);
 		this.reaction = wrappedEvent.getReaction();
 		this.emoji = wrappedEvent.getEmoji();
-		this.user = wrappedEvent.getUser();
+		this.user = tryMember(wrappedEvent.getUser());
 	}
 
 	@Info("Gets information about the reaction. Note that most of the methods on the returned object are useless as Discord provides very little information to this event.")

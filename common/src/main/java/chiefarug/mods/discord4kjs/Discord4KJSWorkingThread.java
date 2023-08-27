@@ -10,7 +10,6 @@ import java.time.Duration;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.CONSOLE;
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
-import static chiefarug.mods.discord4kjs.Discord4KJS.connectToDiscord;
 import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
 
 public class Discord4KJSWorkingThread extends Thread {
