@@ -92,6 +92,21 @@ public class DiscordTypeWrappers {
 		return null;
 	}
 
+	public static Member member(Context _c, Object o) {
+		// we can't use jda() if not connected and typewrappers
+		// are likely to be used outside event blocks so we need to safeguard here
+		if (!connected) return gracefullyRefuse();
+		// Would be nice if we could have some sort of guild 'context' so that we can use that
+		Guild guild = defaultGuild != null ? defaultGuild : null;
+
+		if (o instanceof Member m) return m;
+		if (o instanceof User u) return asMember(u, guild);
+		User u = user(_c, o);
+		if (u != null) return asMember(u, guild);
+
+		return null;
+	}
+
 	public static MessageChannel messageChannel(Context ctx, Object o) {
 		// we can't use jda() if not connected and typewrappers
 		// are likely to be used outside event blocks so we need to safeguard here
@@ -135,21 +150,25 @@ public class DiscordTypeWrappers {
 
 	// Helper method to try and convert a User to a Member of the specified Guild.
 	// We mixin so that Member extends User, so that no funtionality is lost for scripters,
-	// who don't have to worry about casting and just see the base object
+	// and this cast works
 	@NotNull
 	public static User tryMember(@NotNull User user, @Nullable Guild guild) {
-		Member m = null;
-		if (guild != null) {
-			m = guild.getMember(user);
-		}
+		Member m = asMember(user, guild);
 		if (m != null) return (User) m;
 		return user;
 	}
 
 	@NotNull
 	public static User tryMember(@NotNull User user) {
-		if (defaultGuild == null) return user;
 		return tryMember(user, defaultGuild);
+	}
+
+	@Nullable
+	private static Member asMember(@NotNull User user, @Nullable Guild guild) {
+		Member m = null;
+		if (guild != null)
+			m = guild.getMember(user);
+		return m;
 	}
 
 	@Nullable

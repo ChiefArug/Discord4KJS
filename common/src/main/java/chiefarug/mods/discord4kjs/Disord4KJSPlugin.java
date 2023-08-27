@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -50,6 +51,7 @@ public class Disord4KJSPlugin extends KubeJSPlugin {
 		event.register(User.class, DiscordTypeWrappers::user);
 		event.register(MessageChannel.class, DiscordTypeWrappers::messageChannel);
 		event.register(ISnowflake.class, DiscordTypeWrappers::snowflake);
+		event.register(Member.class, DiscordTypeWrappers::member);
 	}
 
 	private void serverBindings(BindingsEvent event) {
