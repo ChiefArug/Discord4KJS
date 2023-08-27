@@ -22,6 +22,7 @@
     // Method adders
     "methods.Guild",
     "methods.User",
+    "methods.Member",
     "methods.Channel"
   ],
   "injectors": {
