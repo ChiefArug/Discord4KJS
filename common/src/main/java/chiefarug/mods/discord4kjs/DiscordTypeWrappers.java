@@ -16,7 +16,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
-import static chiefarug.mods.discord4kjs.Discord4KJS.connected;
+import static chiefarug.mods.discord4kjs.Discord4KJS.isConnected;
 import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
 import static chiefarug.mods.discord4kjs.DiscordWrapper.defaultGuild;
 
@@ -66,7 +66,7 @@ public class DiscordTypeWrappers {
 	public static Guild guild(Context _c, Object o) {
 		// we can't use jda() if not connected and typewrappers
 		// are likely to be used outside event blocks so we need to safeguard here
-		if (!connected) return gracefullyRefuse();
+		if (!isConnected()) return gracefullyRefuse();
 
 		if (o instanceof Guild g) return g;
 		Long snowflake = asSnowflake(o);
@@ -80,7 +80,7 @@ public class DiscordTypeWrappers {
 	public static User user(Context _c, Object o) {
 		// we can't use jda() if not connected and typewrappers
 		// are likely to be used outside event blocks so we need to safeguard here
-		if (!connected) return gracefullyRefuse();
+		if (!isConnected()) return gracefullyRefuse();
 
 		if (o instanceof User u) {
 			return tryMember(u);
@@ -95,7 +95,7 @@ public class DiscordTypeWrappers {
 	public static Member member(Context _c, Object o) {
 		// we can't use jda() if not connected and typewrappers
 		// are likely to be used outside event blocks so we need to safeguard here
-		if (!connected) return gracefullyRefuse();
+		if (!isConnected()) return gracefullyRefuse();
 		// Would be nice if we could have some sort of guild 'context' so that we can use that
 		Guild guild = defaultGuild != null ? defaultGuild : null;
 
@@ -110,7 +110,7 @@ public class DiscordTypeWrappers {
 	public static MessageChannel messageChannel(Context ctx, Object o) {
 		// we can't use jda() if not connected and typewrappers
 		// are likely to be used outside event blocks so we need to safeguard here
-		if (!connected) return gracefullyRefuse();
+		if (!isConnected()) return gracefullyRefuse();
 
 		if (o instanceof MessageChannel c) return c;
 

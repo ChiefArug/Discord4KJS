@@ -34,10 +34,12 @@ public class Discord4KJS {
     public static final String MOD_ID = "discord4kjs";
     public static final Logger LGGR = LogUtils.getLogger();
     public transient static ConsoleJS CONSOLE = new ConsoleJS(ScriptType.SERVER, LGGR);
-
-    public static transient volatile boolean connected = false;
     private transient static Parser markdownParser = new Parser();
     static final SetAndForget<JDA> jda = new SetAndForget<>();
+
+	public static boolean isConnected() {
+		return jda().getStatus() == JDA.Status.CONNECTED;
+	}
 
     @HideFromJS
     public static final JDA jda() {
@@ -100,7 +102,6 @@ public class Discord4KJS {
 			return;
 		}
 		LGGR.info("Connected to Discord in {}", loginTimer.stop());
-		connected = true;
 		Discord4KJS.jda.set(jda);
 	}
 
