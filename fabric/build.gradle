@@ -39,10 +39,12 @@ dependencies {
 
     implementation("net.dv8tion:JDA:${jda_version}") {
         exclude module: 'opus-java'
+        exclude group: 'com.iwebpp.crypto'
     }
     loom {
         include("net.dv8tion:JDA:${jda_version}") {
             exclude module: 'opus-java'
+            exclude group: 'com.iwebpp.crypto'
         }
     }
 }
