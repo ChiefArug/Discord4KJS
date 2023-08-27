@@ -6,13 +6,12 @@
   "verbose": true,
   "mixins": [
     "ExtraThreadsShutdownMixin",
-
-    "annotations.JDAImpl_HideFromJS",
-    "annotations.IOUtil_HideFromJS",
-    "annotations.OkHttpClient$Builder_HideFromJS",
-    "annotations.Requester_HideFromJS",
-    "annotations.SessionConfig_HideFromJS",
-    "annotations.ShardingSessionConfig_HideFromJS",
+    "annotations.hidefromjs.JDAImpl",
+    "annotations.hidefromjs.IOUtil",
+    "annotations.hidefromjs.OkHttpClient$Builder",
+    "annotations.hidefromjs.Requester",
+    "annotations.hidefromjs.SessionConfig",
+    "annotations.hidefromjs.ShardingSessionConfig",
 
     "methods.Guild",
     "methods.User",

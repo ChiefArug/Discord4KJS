@@ -1,9 +1,8 @@
-package chiefarug.mods.discord4kjs.mixin.annotations;
+package chiefarug.mods.discord4kjs.mixin.annotations.hidefromjs;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import net.dv8tion.jda.api.hooks.IEventManager;
-import net.dv8tion.jda.internal.JDAImpl;
 import net.dv8tion.jda.internal.requests.Requester;
 import net.dv8tion.jda.internal.requests.WebSocketClient;
 import okhttp3.OkHttpClient;
@@ -12,8 +11,8 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.List;
 
-@Mixin(value = JDAImpl.class, remap = false)
-public abstract class JDAImpl_HideFromJS {
+@Mixin(value = net.dv8tion.jda.internal.JDAImpl.class, remap = false)
+public abstract class JDAImpl {
 
 	@Shadow
 	@HideFromJS
