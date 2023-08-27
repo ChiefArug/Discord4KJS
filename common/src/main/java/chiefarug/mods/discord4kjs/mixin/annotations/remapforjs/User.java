@@ -10,8 +10,4 @@ public abstract class User {
 	@Shadow
 	@RemapForJS("getUsername")
 	public abstract String getName();
-
-	@Shadow
-	@RemapForJS("getName")
-    public abstract String getEffectiveName();
 }
