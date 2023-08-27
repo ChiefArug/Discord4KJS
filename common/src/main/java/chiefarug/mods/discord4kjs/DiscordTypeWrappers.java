@@ -173,7 +173,8 @@ public class DiscordTypeWrappers {
 
 	@Nullable
 	private static <T> T gracefullyRefuse() {
-		LGGR.warn("Discord4KJS is not connected to Discord, gracefully refusing to typewrap! Consider using script headers to stop the script loading if not connected to Discord"); // todo: script headers
+		LGGR.warn("Discord4KJS is not connected to Discord, gracefully refusing to typewrap! Consider using the discord script header to stop the script loading if not connected to Discord");
+		LGGR.warn("To use the script header just put '// discord: true' at the top of your script file (do not include the '). This will prevent the **entire** script from loading if we aren't connected to Discord");
 		return null;
 	}
 }

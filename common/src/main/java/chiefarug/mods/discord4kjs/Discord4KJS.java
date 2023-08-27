@@ -35,7 +35,7 @@ public class Discord4KJS {
     public static final Logger LGGR = LogUtils.getLogger();
     public transient static ConsoleJS CONSOLE = new ConsoleJS(ScriptType.SERVER, LGGR);
 
-    static volatile boolean connected = false;
+    public static transient volatile boolean connected = false;
     private transient static Parser markdownParser = new Parser();
     static final SetAndForget<JDA> jda = new SetAndForget<>();
 

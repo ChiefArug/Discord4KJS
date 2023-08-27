@@ -5,14 +5,21 @@
   "compatibilityLevel": "JAVA_17",
   "verbose": true,
   "mixins": [
+    // Injections
     "ExtraThreadsShutdownMixin",
+    "SkipScriptLoadingMixin",
+
+    // Annotations adders
     "annotations.hidefromjs.JDAImpl",
     "annotations.hidefromjs.IOUtil",
     "annotations.hidefromjs.OkHttpClient$Builder",
     "annotations.hidefromjs.Requester",
     "annotations.hidefromjs.SessionConfig",
     "annotations.hidefromjs.ShardingSessionConfig",
+    "annotations.remapforjs.Member",
+    "annotations.remapforjs.User",
 
+    // Method adders
     "methods.Guild",
     "methods.User",
     "methods.Channel"
