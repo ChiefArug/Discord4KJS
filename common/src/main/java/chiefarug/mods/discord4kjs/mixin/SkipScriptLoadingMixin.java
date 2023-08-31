@@ -29,9 +29,8 @@ public abstract class SkipScriptLoadingMixin {
 	public void discord4kjs$onPreload(ScriptSource source, CallbackInfoReturnable<Throwable> ci) {
 		discord4kjs$requiresDiscordConnection = getProperty("discord", "false").equals("true");
 		// This will mean that loading discord scripts from a datapack fails, but that is fine as no one uses those.
-		if (discord4kjs$requiresDiscordConnection && !pack.namespace.equals("se	rver_scripts")) {
-			LGGR.error("Tried to use discord header from a non server_scripts script. This is not a good idea due to other script types usually loading before we have a chance to finish connecting!");
-			throw new IllegalStateException("Do not use the discord header in non server script!");
+		if (discord4kjs$requiresDiscordConnection && !pack.namespace.equals("server_scripts")) {
+			throw new IllegalCallerException("Tried to use the // discord: true header in a non server_scripts script. This is not a good idea due to other script types being loaded before we have a chance to finish connecting!");
 		}
 	}
 

@@ -18,10 +18,17 @@ public class ChannelUpdatedEventJS<T> extends ChannelEventJS {
 		this.newValue = wrappedEvent.getNewValue();
 	}
 
+	public ChannelUpdatedEventJS(String changed, T oldValue, T newValue, GenericChannelEvent wrappedEvent) {
+		super(wrappedEvent);
+		this.changed = changed;
+		this.oldValue = oldValue;
+		this.newValue = newValue;
+	}
+
 	@Info("""
 			Returns the property that changed.
 			Note that not all properties are available on all channels. Some are voice specific, some are thread specific and some are forum specific
-			One of: type, name, flags, parent, position, default_thread_slowmode, default_reaction_emoji, topic, nsfw, slowmode, available_tags, bitrate, region, userlimit, autoArchiveDuration, archived, archiveTimestamp, locked, invitable, applied_tags, default_forum_layout
+			type, name, flags, parent, position, default_thread_slowmode, default_reaction_emoji, topic, nsfw, slowmode, available_tags, bitrate, region, userlimit, autoArchiveDuration, archived, archiveTimestamp, locked, invitable, applied_tags, default_forum_layout
 			""")
 	public String getProperty() {
 		return changed;

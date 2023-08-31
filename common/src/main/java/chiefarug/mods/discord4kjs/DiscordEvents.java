@@ -17,6 +17,9 @@ import chiefarug.mods.discord4kjs.events.message.ReactionAddedEventJS;
 import chiefarug.mods.discord4kjs.events.message.ReactionRemovedEventJS;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
+import dev.latvian.mods.kubejs.event.Extra;
+
+import static chiefarug.mods.discord4kjs.DiscordExtras.*;
 
 public interface DiscordEvents {
 	EventGroup GROUP = EventGroup.of("DiscordEvents");
@@ -33,23 +36,24 @@ public interface DiscordEvents {
 
 
 	// User update events
-	EventHandler USER_NAME_UPDATE = event("nameChanged", UserNameUpdateEventJS.class);
+	EventHandler USER_NAME_UPDATE = event("nameChanged", UserNameUpdateEventJS.class).extra(USER);
 
 	// Message Events
-	EventHandler MESSAGE_RECIEVED = event("messageRecieved", MessageRecievedEventJS.class);
-	EventHandler MESSAGE_EDITED = event("messageEdited", MessageEditedEventJS.class);
-	EventHandler MESSAGE_DELETED = event("messageDeleted", MessageDeletedEventJS.class);
-	EventHandler MESSAGES_BULK_DELETED = event("bulkMessagesDeleted", MessageBulkDeletedEventJS.class);
-	EventHandler MESSAGE_EMBED_ADDED = event("messageEmbedAdded", MessageEmbedAddedEventJS.class);
+	EventHandler MESSAGE_RECIEVED = event("messageRecieved", MessageRecievedEventJS.class).extra(CHANNEL);
+	EventHandler MESSAGE_EDITED = event("messageEdited", MessageEditedEventJS.class).extra(CHANNEL);
+	EventHandler MESSAGE_DELETED = event("messageDeleted", MessageDeletedEventJS.class).extra(CHANNEL);
+	EventHandler MESSAGES_BULK_DELETED = event("bulkMessagesDeleted", MessageBulkDeletedEventJS.class).extra(CHANNEL);
+	EventHandler MESSAGE_EMBED_ADDED = event("messageEmbedAdded", MessageEmbedAddedEventJS.class).extra(CHANNEL);
 	// Reaction Events
-	EventHandler REACTION_ADDED = event("reactionAdded", ReactionAddedEventJS.class);
-	EventHandler REACTION_REMOVED = event("reactionRemoved", ReactionRemovedEventJS.class);
+	EventHandler REACTION_ADDED = event("reactionAdded", ReactionAddedEventJS.class).extra(EMOJI);
+	EventHandler REACTION_REMOVED = event("reactionRemoved", ReactionRemovedEventJS.class).extra(EMOJI);
 
 	// Channel events
-	EventHandler CHANNEL_CREATED = event("channelCreated", ChannelCreatedEventJS.class);
-	EventHandler CHANNEL_DELETED = event("channelDeleted", ChannelDeletedEventJS.class);
-	EventHandler CHANNEL_UPDATED = event("channelUpdated", ChannelUpdatedEventJS.class);
-	EventHandler CHANNEL_MOVED = event("channelMoved", ChanelMovedEventJS.class);
-
+	EventHandler CHANNEL_CREATED = event("channelCreated", ChannelCreatedEventJS.class).extra(GUILD);
+	EventHandler CHANNEL_DELETED = event("channelDeleted", ChannelDeletedEventJS.class).extra(GUILD);
+	EventHandler CHANNEL_UPDATED = event("channelUpdated", ChannelUpdatedEventJS.class).extra(GUILD);
+	// Thread events
+//	EventHandler THREAD_REVEALED = event("threadRevealed", ThreadRevealedEventJS.class);
+//	EventHandler THREAD_HIDDEN = event("threadHidden", ThreadHiddenEventJS.class);
 
 }

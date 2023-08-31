@@ -136,8 +136,7 @@ public class DiscordTypeWrappers {
 	}
 
 	private static final double maxSafeDouble = 1L << 53;
-	private static Long asSnowflake(Object o) {
-		LGGR.debug(o.toString());
+	static Long asSnowflake(Object o) {
 		if (o instanceof Number n) {
 			if (!(n instanceof Long) && n.doubleValue() > maxSafeDouble)
 				LGGR.error("Cannot safely use raw numbers for Discord snowflake of about " + n.longValue() + " due to number precision errors. Surround it in ' to convert it to a string");

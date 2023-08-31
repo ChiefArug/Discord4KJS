@@ -1,7 +1,13 @@
 package chiefarug.mods.discord4kjs;
 
+import chiefarug.mods.discord4kjs.events.channel.ChannelUpdatedEventJS;
 import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.script.ScriptType;
+import dev.latvian.mods.kubejs.script.ScriptTypeHolder;
+import net.dv8tion.jda.api.entities.channel.forums.ForumTag;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.automod.AutoModExecutionEvent;
 import net.dv8tion.jda.api.events.automod.AutoModRuleCreateEvent;
@@ -9,8 +15,9 @@ import net.dv8tion.jda.api.events.automod.AutoModRuleDeleteEvent;
 import net.dv8tion.jda.api.events.automod.AutoModRuleUpdateEvent;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
-import net.dv8tion.jda.api.events.channel.forum.ForumTagAddEvent;
+import net.dv8tion.jda.api.events.channel.GenericChannelEvent;
 import net.dv8tion.jda.api.events.channel.forum.ForumTagRemoveEvent;
+import net.dv8tion.jda.api.events.channel.forum.GenericForumTagEvent;
 import net.dv8tion.jda.api.events.channel.forum.update.ForumTagUpdateEmojiEvent;
 import net.dv8tion.jda.api.events.channel.forum.update.ForumTagUpdateModeratedEvent;
 import net.dv8tion.jda.api.events.channel.forum.update.ForumTagUpdateNameEvent;
@@ -56,8 +63,6 @@ import net.dv8tion.jda.api.events.message.MessageEmbedEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveAllEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEmojiEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.RoleCreateEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
@@ -70,10 +75,6 @@ import net.dv8tion.jda.api.events.role.update.RoleUpdatePermissionsEvent;
 import net.dv8tion.jda.api.events.role.update.RoleUpdatePositionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
-import net.dv8tion.jda.api.events.stage.StageInstanceCreateEvent;
-import net.dv8tion.jda.api.events.stage.StageInstanceDeleteEvent;
-import net.dv8tion.jda.api.events.stage.update.StageInstanceUpdatePrivacyLevelEvent;
-import net.dv8tion.jda.api.events.stage.update.StageInstanceUpdateTopicEvent;
 import net.dv8tion.jda.api.events.sticker.GuildStickerAddedEvent;
 import net.dv8tion.jda.api.events.sticker.GuildStickerRemovedEvent;
 import net.dv8tion.jda.api.events.sticker.update.GuildStickerUpdateAvailableEvent;
@@ -87,6 +88,7 @@ import net.dv8tion.jda.api.events.thread.member.ThreadMemberLeaveEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateGlobalNameEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.internal.entities.ForumTagImpl;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 import static chiefarug.mods.discord4kjs.DiscordEvents.*;
@@ -94,6 +96,11 @@ import static chiefarug.mods.discord4kjs.DiscordEvents.*;
 public class EventListeners extends ListenerAdapter {
 
 	private void postWrappedEvent(EventHandler handler, GenericEvent event) {
+		postWrappedEventWithExtra(handler, event, null);
+	}
+	static transient boolean hi;
+
+	private void postWrappedEventWithExtra(EventHandler handler, GenericEvent event, Object extra) {
 		if (handler.hasListeners()) {
 			EventJS eventJS;
 			try {
@@ -101,12 +108,11 @@ public class EventListeners extends ListenerAdapter {
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}
-			handler.post(eventJS);
+			handler.post(handler.scriptTypePredicate instanceof ScriptTypeHolder sth ? sth : ScriptType.SERVER, extra, eventJS);
 		}
 	}
 
-	@Override
-	public void onReady(ReadyEvent event) { postWrappedEvent(READY, event); }
+	public void onReady(ReadyEvent event) { postWrappedEvent(	READY, event); }
 
 //	@Override
 //	public void onSessionInvalidate(SessionInvalidateEvent event) {
@@ -133,7 +139,6 @@ public class EventListeners extends ListenerAdapter {
 //		super.onStatusChange(event);
 //	}
 
-	@Override
 	public void onShutdown(ShutdownEvent event) { postWrappedEvent(DISCONNECTED, event); }
 
 //	@Override
@@ -200,42 +205,27 @@ public class EventListeners extends ListenerAdapter {
 
 
 	// Messages
-	@Override
-	public void onMessageReceived(MessageReceivedEvent event) { postWrappedEvent(MESSAGE_RECIEVED, event); }
-
-	@Override
-	public void onMessageUpdate(MessageUpdateEvent event) { postWrappedEvent(MESSAGE_EDITED, event); }
-
-	@Override
-	public void onMessageDelete(MessageDeleteEvent event) { postWrappedEvent(MESSAGE_DELETED, event); }
-
-	@Override
-	public void onMessageBulkDelete(MessageBulkDeleteEvent event) { postWrappedEvent(MESSAGES_BULK_DELETED, event); }
-
-	@Override
-	public void onMessageEmbed(MessageEmbedEvent event) { postWrappedEvent(MESSAGE_EMBED_ADDED, event); }
-
-	@Override
-	public void onMessageReactionAdd(MessageReactionAddEvent event) { postWrappedEvent(REACTION_ADDED, event);}
-	@Override
-	public void onMessageReactionRemove(MessageReactionRemoveEvent event) { postWrappedEvent(REACTION_REMOVED, event);}
+	public void onMessageReceived(MessageReceivedEvent event) { postWrappedEventWithExtra(MESSAGE_RECIEVED, event, event.getChannel().getIdLong()); }
+	public void onMessageUpdate(MessageUpdateEvent event) { postWrappedEventWithExtra(MESSAGE_EDITED, event, event.getChannel().getIdLong()); }
+	public void onMessageDelete(MessageDeleteEvent event) { postWrappedEventWithExtra(MESSAGE_DELETED, event, event.getChannel().getIdLong()); }
+	public void onMessageBulkDelete(MessageBulkDeleteEvent event) { postWrappedEventWithExtra(MESSAGES_BULK_DELETED, event, event.getChannel().getIdLong()); }
+	public void onMessageEmbed(MessageEmbedEvent event) { postWrappedEventWithExtra(MESSAGE_EMBED_ADDED, event, event.getChannel().getIdLong()); }
+	public void onMessageReactionAdd(MessageReactionAddEvent event) { postWrappedEventWithExtra(REACTION_ADDED, event, event.getEmoji().getName());}
+	public void onMessageReactionRemove(MessageReactionRemoveEvent event) { postWrappedEventWithExtra(REACTION_REMOVED, event, event.getEmoji().getName());}
 
 //	@Override
 //	public void onMessageReactionRemoveAll(MessageReactionRemoveAllEvent event) {super.onMessageReactionRemoveAll(event);}
 //	@Override // maybe later
 //	public void onMessageReactionRemoveEmoji(MessageReactionRemoveEmojiEvent event) {super.onMessageReactionRemoveEmoji(event);}
 
-	@Override
 	public void onPermissionOverrideDelete(PermissionOverrideDeleteEvent event) {
 		super.onPermissionOverrideDelete(event);
 	}
 
-	@Override
 	public void onPermissionOverrideUpdate(PermissionOverrideUpdateEvent event) {
 		super.onPermissionOverrideUpdate(event);
 	}
 
-	@Override
 	public void onPermissionOverrideCreate(PermissionOverrideCreateEvent event) {
 		super.onPermissionOverrideCreate(event);
 	}
@@ -248,62 +238,44 @@ public class EventListeners extends ListenerAdapter {
 //	public void onStageInstanceUpdatePrivacyLevel(StageInstanceUpdatePrivacyLevelEvent event) {super.onStageInstanceUpdatePrivacyLevel(event);}
 //	@Override
 //	public void onStageInstanceCreate(StageInstanceCreateEvent event) {super.onStageInstanceCreate(event);}
-
-	@Override
-	public void onChannelCreate(ChannelCreateEvent event) { postWrappedEvent(CHANNEL_CREATED, event); }
-
-	@Override
-	public void onChannelDelete(ChannelDeleteEvent event) { postWrappedEvent(CHANNEL_DELETED, event); }
-
-	@Override
-	public void onGenericChannelUpdate(GenericChannelUpdateEvent<?> event) { postWrappedEvent(CHANNEL_UPDATED, event); }
-
-	@Override
-	public void onForumTagAdd(ForumTagAddEvent event) {
-		super.onForumTagAdd(event);
+	
+	// Channel Updates
+	public void onChannelCreate(ChannelCreateEvent event) { postWrappedEventWithExtra(CHANNEL_CREATED, event, event.getGuild()); }
+	public void onChannelDelete(ChannelDeleteEvent event) { postWrappedEventWithExtra(CHANNEL_DELETED, event, event.getGuild()); }
+	public void onGenericChannelUpdate(GenericChannelUpdateEvent<?> event) {
+		CHANNEL_UPDATED.post(ScriptType.SERVER, event.getPropertyIdentifier(), new ChannelUpdatedEventJS<>(event));
 	}
-
-	@Override
-	public void onForumTagRemove(ForumTagRemoveEvent event) {
-		super.onForumTagRemove(event);
+	// Forum Tag Updates
+	private ForumTagImpl copyTag(ForumTag original) {
+		return new ForumTagImpl(original.getIdLong())
+				.setName(original.getName())
+				.setEmoji(original.getEmoji().toData())
+				.setModerated(original.isModerated())
+				.setPosition(original.getPosition());
 	}
-
-	@Override
-	public void onForumTagUpdateName(ForumTagUpdateNameEvent event) {
-		super.onForumTagUpdateName(event);
+	private void postForumTagWrappedEvent(GenericForumTagEvent event, ForumTag oldTag, ForumTag newTag) {
+		if (CHANNEL_UPDATED.hasListeners())
+			CHANNEL_UPDATED.post(ScriptType.SERVER, "available_tags", new ChannelUpdatedEventJS<>("available_tags", oldTag, newTag, new GenericChannelEvent(event.getJDA(), event.getResponseNumber(), event.getChannel())));
 	}
+	private void postForumTagWrappedEvent(GenericForumTagEvent event, ForumTag oldTag) { postForumTagWrappedEvent(event, oldTag, event.getTag()); }
+	public void onForumTagAdd(GenericForumTagEvent event) { postForumTagWrappedEvent(event, null); }
+	public void onForumTagRemove(ForumTagRemoveEvent event) { postForumTagWrappedEvent(event, event.getTag(), null); }
+	public void onForumTagUpdateName(ForumTagUpdateNameEvent event) { postForumTagWrappedEvent(event, copyTag(event.getTag()).setName(event.getOldName())); }
+	public void onForumTagUpdateEmoji(ForumTagUpdateEmojiEvent event) { postForumTagWrappedEvent(event, copyTag(event.getTag()).setEmoji(event.getOldEmoji().toData())); }
+	public void onForumTagUpdateModerated(ForumTagUpdateModeratedEvent event) { postForumTagWrappedEvent(event, copyTag(event.getTag()).setModerated(event.getOldValue())); }
 
-	@Override
-	public void onForumTagUpdateEmoji(ForumTagUpdateEmojiEvent event) {
-		super.onForumTagUpdateEmoji(event);
-	}
+	// Threads
+//	public void onThreadRevealed(ThreadRevealedEvent event) { postWrappedEvent(THREAD_REVEALED, event); }
+//	public void onThreadHidden(ThreadHiddenEvent event) { postWrappedEvent(THREAD_HIDDEN, event); }
 
-	@Override
-	public void onForumTagUpdateModerated(ForumTagUpdateModeratedEvent event) {
-		super.onForumTagUpdateModerated(event);
-	}
-
-	@Override
-	public void onThreadRevealed(ThreadRevealedEvent event) {
-		super.onThreadRevealed(event);
-	}
-
-	@Override
-	public void onThreadHidden(ThreadHiddenEvent event) {
-		super.onThreadHidden(event);
-	}
-
-	@Override
 	public void onThreadMemberJoin(ThreadMemberJoinEvent event) {
 		super.onThreadMemberJoin(event);
 	}
 
-	@Override
 	public void onThreadMemberLeave(ThreadMemberLeaveEvent event) {
 		super.onThreadMemberLeave(event);
 	}
 
-	@Override
 	public void onGuildReady(GuildReadyEvent event) {
 		if (Discord4KJSConfig.autofillDefaultGuild) {
 			if (DiscordWrapper.defaultGuild != null)
@@ -313,433 +285,347 @@ public class EventListeners extends ListenerAdapter {
 		}
 	}
 
-	@Override
 	public void onGuildJoin(GuildJoinEvent event) {
 		super.onGuildJoin(event);
 	}
 
-	@Override
 	public void onGuildLeave(GuildLeaveEvent event) {
 		super.onGuildLeave(event);
 	}
-
-	@Override //todo do we need these?
+ //todo do we need these?
 	public void onGuildAvailable(GuildAvailableEvent event) {
 		super.onGuildAvailable(event);
 	}
 
-	@Override
 	public void onGuildUnavailable(GuildUnavailableEvent event) {
 		super.onGuildUnavailable(event);
 	}
 
-	@Override
 	public void onGuildBan(GuildBanEvent event) {
 		super.onGuildBan(event);
 	}
 
-	@Override
 	public void onGuildUnban(GuildUnbanEvent event) {
 		super.onGuildUnban(event);
 	}
 
-	@Override
 	public void onGuildAuditLogEntryCreate(GuildAuditLogEntryCreateEvent event) {
 		super.onGuildAuditLogEntryCreate(event);
 	}
-
-	@Override // merge kicks, bans and leaving?
+ // merge kicks, bans and leaving?
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
 		super.onGuildMemberRemove(event);
 	}
-
-	@Override //merge with channel update event?
+ //merge with channel update event?
 	public void onGuildUpdateAfkChannel(GuildUpdateAfkChannelEvent event) {
 		super.onGuildUpdateAfkChannel(event);
 	}
-
-	@Override // more channel updates. or maybe guild settings update
+ // more channel updates. or maybe guild settings update
 	public void onGuildUpdateSystemChannel(GuildUpdateSystemChannelEvent event) {
 		super.onGuildUpdateSystemChannel(event);
 	}
 
-	@Override
 	public void onGuildUpdateRulesChannel(GuildUpdateRulesChannelEvent event) {
 		super.onGuildUpdateRulesChannel(event);
 	}
 
-	@Override
 	public void onGuildUpdateCommunityUpdatesChannel(GuildUpdateCommunityUpdatesChannelEvent event) {
 		super.onGuildUpdateCommunityUpdatesChannel(event);
 	}
 
-	@Override
 	public void onGuildUpdateAfkTimeout(GuildUpdateAfkTimeoutEvent event) {
 		super.onGuildUpdateAfkTimeout(event);
 	}
 
-	@Override
 	public void onGuildUpdateExplicitContentLevel(GuildUpdateExplicitContentLevelEvent event) {
 		super.onGuildUpdateExplicitContentLevel(event);
 	}
 
-	@Override
 	public void onGuildUpdateIcon(GuildUpdateIconEvent event) {
 		super.onGuildUpdateIcon(event);
 	}
 
-	@Override
 	public void onGuildUpdateMFALevel(GuildUpdateMFALevelEvent event) {
 		super.onGuildUpdateMFALevel(event);
 	}
 
-	@Override
 	public void onGuildUpdateName(GuildUpdateNameEvent event) {
 		super.onGuildUpdateName(event);
 	}
 
-	@Override
 	public void onGuildUpdateNotificationLevel(GuildUpdateNotificationLevelEvent event) {
 		super.onGuildUpdateNotificationLevel(event);
 	}
 
-	@Override
 	public void onGuildUpdateOwner(GuildUpdateOwnerEvent event) {
 		super.onGuildUpdateOwner(event);
 	}
 
-	@Override
 	public void onGuildUpdateSplash(GuildUpdateSplashEvent event) {
 		super.onGuildUpdateSplash(event);
 	}
 
-	@Override
 	public void onGuildUpdateVerificationLevel(GuildUpdateVerificationLevelEvent event) {
 		super.onGuildUpdateVerificationLevel(event);
 	}
 
-	@Override
 	public void onGuildUpdateLocale(GuildUpdateLocaleEvent event) {
 		super.onGuildUpdateLocale(event);
 	}
 
-	@Override
 	public void onGuildUpdateFeatures(GuildUpdateFeaturesEvent event) {
 		super.onGuildUpdateFeatures(event);
 	}
 
-	@Override
 	public void onGuildUpdateVanityCode(GuildUpdateVanityCodeEvent event) {
 		super.onGuildUpdateVanityCode(event);
 	}
 
-	@Override
 	public void onGuildUpdateBanner(GuildUpdateBannerEvent event) {
 		super.onGuildUpdateBanner(event);
 	}
 
-	@Override
 	public void onGuildUpdateDescription(GuildUpdateDescriptionEvent event) {
 		super.onGuildUpdateDescription(event);
 	}
 
-	@Override
 	public void onGuildUpdateBoostTier(GuildUpdateBoostTierEvent event) {
 		super.onGuildUpdateBoostTier(event);
 	}
 
-	@Override
 	public void onGuildUpdateBoostCount(GuildUpdateBoostCountEvent event) {
 		super.onGuildUpdateBoostCount(event);
 	}
 
-	@Override
 	public void onGuildUpdateMaxMembers(GuildUpdateMaxMembersEvent event) {
 		super.onGuildUpdateMaxMembers(event);
 	}
 
-	@Override
 	public void onGuildUpdateMaxPresences(GuildUpdateMaxPresencesEvent event) {
 		super.onGuildUpdateMaxPresences(event);
 	}
 
-	@Override
 	public void onGuildUpdateNSFWLevel(GuildUpdateNSFWLevelEvent event) {
 		super.onGuildUpdateNSFWLevel(event);
 	}
-
-	@Override // event edited event, like guild and channel
+ // event edited event, like guild and channel
 	public void onScheduledEventUpdateDescription(ScheduledEventUpdateDescriptionEvent event) {
 		super.onScheduledEventUpdateDescription(event);
 	}
 
-	@Override
 	public void onScheduledEventUpdateEndTime(ScheduledEventUpdateEndTimeEvent event) {
 		super.onScheduledEventUpdateEndTime(event);
 	}
 
-	@Override
 	public void onScheduledEventUpdateLocation(ScheduledEventUpdateLocationEvent event) {
 		super.onScheduledEventUpdateLocation(event);
 	}
 
-	@Override
 	public void onScheduledEventUpdateName(ScheduledEventUpdateNameEvent event) {
 		super.onScheduledEventUpdateName(event);
 	}
 
-	@Override
 	public void onScheduledEventUpdateStartTime(ScheduledEventUpdateStartTimeEvent event) {
 		super.onScheduledEventUpdateStartTime(event);
 	}
 
-	@Override
 	public void onScheduledEventUpdateStatus(ScheduledEventUpdateStatusEvent event) {
 		super.onScheduledEventUpdateStatus(event);
 	}
 
-	@Override
 	public void onScheduledEventCreate(ScheduledEventCreateEvent event) {
 		super.onScheduledEventCreate(event);
 	}
 
-	@Override
 	public void onScheduledEventDelete(ScheduledEventDeleteEvent event) {
 		super.onScheduledEventDelete(event);
 	}
 
-	@Override
 	public void onScheduledEventUserAdd(ScheduledEventUserAddEvent event) {
 		super.onScheduledEventUserAdd(event);
 	}
 
-	@Override
 	public void onScheduledEventUserRemove(ScheduledEventUserRemoveEvent event) {
 		super.onScheduledEventUserRemove(event);
 	}
-
-	@Override // invite event?
+ // invite event?
 	public void onGuildInviteCreate(GuildInviteCreateEvent event) {
 		super.onGuildInviteCreate(event);
 	}
 
-	@Override
 	public void onGuildInviteDelete(GuildInviteDeleteEvent event) {
 		super.onGuildInviteDelete(event);
 	}
 
-	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		super.onGuildMemberJoin(event);
 	}
-
-	@Override // generic member modified event?
+ // generic member modified event?
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
 		super.onGuildMemberRoleAdd(event);
 	}
 
-	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
 		super.onGuildMemberRoleRemove(event);
 	}
 
-	@Override
 	public void onGuildMemberUpdate(GuildMemberUpdateEvent event) {
 		super.onGuildMemberUpdate(event);
 	}
 
 
-	@Override
 	public void onGuildMemberUpdateAvatar(GuildMemberUpdateAvatarEvent event) {
 		super.onGuildMemberUpdateAvatar(event);
 	}
 
-	@Override
 	public void onGuildMemberUpdateBoostTime(GuildMemberUpdateBoostTimeEvent event) {
 		super.onGuildMemberUpdateBoostTime(event);
 	}
 
-	@Override
 	public void onGuildMemberUpdatePending(GuildMemberUpdatePendingEvent event) {
 		super.onGuildMemberUpdatePending(event);
 	}
 
-	@Override
 	public void onGuildMemberUpdateFlags(GuildMemberUpdateFlagsEvent event) {
 		super.onGuildMemberUpdateFlags(event);
 	}
 
-	@Override
 	public void onGuildMemberUpdateTimeOut(GuildMemberUpdateTimeOutEvent event) {
 		super.onGuildMemberUpdateTimeOut(event);
 	}
 
-	@Override
 	public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
 		super.onGuildVoiceUpdate(event);
 	}
 
-	@Override
 	public void onGuildVoiceGuildMute(GuildVoiceGuildMuteEvent event) {
 		super.onGuildVoiceGuildMute(event);
 	}
-
-	@Override // combine with GuildVoiceGuildMuteEvent. the pre combined event isnt nice
+ // combine with GuildVoiceGuildMuteEvent. the pre combined event isnt nice
 	public void onGuildVoiceSelfMute(GuildVoiceSelfMuteEvent event) {
 		super.onGuildVoiceSelfMute(event);
 	}
-
-	@Override // combine with GuildVoiceSelfDeafenEvent. the pre combined event isnt nice
+ // combine with GuildVoiceSelfDeafenEvent. the pre combined event isnt nice
 	public void onGuildVoiceGuildDeafen(GuildVoiceGuildDeafenEvent event) {
 		super.onGuildVoiceGuildDeafen(event);
 	}
 
-	@Override
 	public void onGuildVoiceSelfDeafen(GuildVoiceSelfDeafenEvent event) {
 		super.onGuildVoiceSelfDeafen(event);
 	}
 
-	@Override
 	public void onGuildVoiceSuppress(GuildVoiceSuppressEvent event) {
 		super.onGuildVoiceSuppress(event);
 	}
 
-	@Override
 	public void onGuildVoiceStream(GuildVoiceStreamEvent event) {
 		super.onGuildVoiceStream(event);
 	}
 
-	@Override
 	public void onGuildVoiceVideo(GuildVoiceVideoEvent event) {
 		super.onGuildVoiceVideo(event);
 	}
 
-	@Override
 	public void onGuildVoiceRequestToSpeak(GuildVoiceRequestToSpeakEvent event) {
 		super.onGuildVoiceRequestToSpeak(event);
 	}
 
-	@Override
 	public void onAutoModExecution(AutoModExecutionEvent event) {
 		super.onAutoModExecution(event);
 	}
-
-	@Override // automod rule event
+ // automod rule event
 	public void onAutoModRuleCreate(AutoModRuleCreateEvent event) {
 		super.onAutoModRuleCreate(event);
 	}
 
-	@Override
 	public void onAutoModRuleUpdate(AutoModRuleUpdateEvent event) {
 		super.onAutoModRuleUpdate(event);
 	}
 
-	@Override
 	public void onAutoModRuleDelete(AutoModRuleDeleteEvent event) {
 		super.onAutoModRuleDelete(event);
 	}
-
-	@Override // role update event
+ // role update event
 	public void onRoleCreate(RoleCreateEvent event) {
 		super.onRoleCreate(event);
 	}
 
-	@Override
 	public void onRoleDelete(RoleDeleteEvent event) {
 		super.onRoleDelete(event);
 	}
 
-	@Override
 	public void onRoleUpdateColor(RoleUpdateColorEvent event) {
 		super.onRoleUpdateColor(event);
 	}
 
-	@Override
 	public void onRoleUpdateHoisted(RoleUpdateHoistedEvent event) {
 		super.onRoleUpdateHoisted(event);
 	}
 
-	@Override
 	public void onRoleUpdateIcon(RoleUpdateIconEvent event) {
 		super.onRoleUpdateIcon(event);
 	}
 
-	@Override
 	public void onRoleUpdateMentionable(RoleUpdateMentionableEvent event) {
 		super.onRoleUpdateMentionable(event);
 	}
 
-	@Override
 	public void onRoleUpdateName(RoleUpdateNameEvent event) {
 		super.onRoleUpdateName(event);
 	}
 
-	@Override
 	public void onRoleUpdatePermissions(RoleUpdatePermissionsEvent event) {
 		super.onRoleUpdatePermissions(event);
 	}
 
-	@Override
 	public void onRoleUpdatePosition(RoleUpdatePositionEvent event) {
 		super.onRoleUpdatePosition(event);
 	}
-
-	@Override // emoji update event
+ // emoji update event
 	public void onEmojiAdded(EmojiAddedEvent event) {
 		super.onEmojiAdded(event);
 	}
 
-	@Override
 	public void onEmojiRemoved(EmojiRemovedEvent event) {
 		super.onEmojiRemoved(event);
 	}
 
-	@Override
 	public void onEmojiUpdateName(EmojiUpdateNameEvent event) {
 		super.onEmojiUpdateName(event);
 	}
 
-	@Override
 	public void onEmojiUpdateRoles(EmojiUpdateRolesEvent event) {
 		super.onEmojiUpdateRoles(event);
 	}
-
-	@Override // wuts this
+ // wuts this
 	public void onApplicationCommandUpdatePrivileges(ApplicationCommandUpdatePrivilegesEvent event) {
 		super.onApplicationCommandUpdatePrivileges(event);
 	}
 
-	@Override
 	public void onApplicationUpdatePrivileges(ApplicationUpdatePrivilegesEvent event) {
 		super.onApplicationUpdatePrivileges(event);
 	}
-
-	@Override // stticker update event
+ // stticker update event
 	public void onGuildStickerAdded(GuildStickerAddedEvent event) {
 		super.onGuildStickerAdded(event);
 	}
 
-	@Override
 	public void onGuildStickerRemoved(GuildStickerRemovedEvent event) {
 		super.onGuildStickerRemoved(event);
 	}
 
-	@Override
 	public void onGuildStickerUpdateName(GuildStickerUpdateNameEvent event) {
 		super.onGuildStickerUpdateName(event);
 	}
 
-	@Override
 	public void onGuildStickerUpdateTags(GuildStickerUpdateTagsEvent event) {
 		super.onGuildStickerUpdateTags(event);
 	}
 
-	@Override
 	public void onGuildStickerUpdateDescription(GuildStickerUpdateDescriptionEvent event) {
 		super.onGuildStickerUpdateDescription(event);
 	}
 
-	@Override
 	public void onGuildStickerUpdateAvailable(GuildStickerUpdateAvailableEvent event) {
 		super.onGuildStickerUpdateAvailable(event);
 	}

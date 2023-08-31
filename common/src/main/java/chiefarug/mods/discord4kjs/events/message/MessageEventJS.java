@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
+import static chiefarug.mods.discord4kjs.DiscordTypeWrappers.tryMember;
 
 public abstract class MessageEventJS extends ContentlessMessageEventJS {
 
@@ -51,7 +52,7 @@ public abstract class MessageEventJS extends ContentlessMessageEventJS {
 
 	@Info("Returns the user that wrote this message")
 	public User getAuthor() {
-		return message.getAuthor();
+		return tryMember(message.getAuthor());
 	}
 
 	@Info("Returns if this bot send this message")
