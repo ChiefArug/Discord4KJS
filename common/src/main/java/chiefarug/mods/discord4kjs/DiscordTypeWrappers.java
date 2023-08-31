@@ -86,8 +86,8 @@ public class DiscordTypeWrappers {
 			return tryMember(u);
 		}
 		Long snowflake = asSnowflake(o);
-		if  (o != null) return jda().getUserById(snowflake);
-		if (o instanceof CharSequence cs) return jda().getUsersByName(cs.toString(), false).get(0);
+		if  (o != null) return tryMember(jda().getUserById(snowflake));
+		if (o instanceof CharSequence cs) return tryMember(jda().getUsersByName(cs.toString(), false).get(0));
 
 		return null;
 	}
@@ -164,6 +164,7 @@ public class DiscordTypeWrappers {
 
 	@Nullable
 	private static Member asMember(@NotNull User user, @Nullable Guild guild) {
+		if (user instanceof Member m && m.getGuild() == guild) return m;
 		Member m = null;
 		if (guild != null)
 			m = guild.getMember(user);
@@ -171,7 +172,7 @@ public class DiscordTypeWrappers {
 	}
 
 	@Nullable
-	private static <T> T gracefullyRefuse() {
+	private static <T>/*generic magic*/T gracefullyRefuse() {
 		LGGR.warn("Discord4KJS is not connected to Discord, gracefully refusing to typewrap! Consider using the discord script header to stop the script loading if not connected to Discord");
 		LGGR.warn("To use the script header just put '// discord: true' at the top of your script file (do not include the '). This will prevent the **entire** script from loading if we aren't connected to Discord");
 		return null;
