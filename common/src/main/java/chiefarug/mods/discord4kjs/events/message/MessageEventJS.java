@@ -54,10 +54,4 @@ public abstract class MessageEventJS extends ContentlessMessageEventJS {
 	public User getAuthor() {
 		return tryMember(message.getAuthor());
 	}
-
-	@Info("Returns if this bot send this message")
-	public boolean isOwnMessage() {
-		return getAuthor().equals(jda().getSelfUser());
-	}
-
 }
