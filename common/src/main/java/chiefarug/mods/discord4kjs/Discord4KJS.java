@@ -91,7 +91,7 @@ public class Discord4KJS {
 
 		JDABuilder builder = JDABuilder.create(token, Discord4KJSConfig.intents);
 		builder.setActivity(Activity.competing("the most jank Discord bot api setup")); // config?
-		builder.addEventListeners(new EventListeners());
+		builder.setEventManager(new EventListeners());
 		builder.setMemberCachePolicy(ALL); //todo make this a config option
 
 		return builder;

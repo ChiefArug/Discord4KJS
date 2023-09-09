@@ -87,13 +87,17 @@ import net.dv8tion.jda.api.events.thread.member.ThreadMemberJoinEvent;
 import net.dv8tion.jda.api.events.thread.member.ThreadMemberLeaveEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateGlobalNameEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
+import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.internal.entities.ForumTagImpl;
 
+import java.util.List;
+
+import static chiefarug.mods.discord4kjs.Discord4KJS.CONSOLE;
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 import static chiefarug.mods.discord4kjs.DiscordEvents.*;
 
-public class EventListeners extends ListenerAdapter {
+public class EventListeners extends ListenerAdapter implements IEventManager {
 
 	private void postWrappedEvent(EventHandler handler, GenericEvent event) {
 		postWrappedEventWithExtra(handler, event, null);
@@ -112,7 +116,7 @@ public class EventListeners extends ListenerAdapter {
 		}
 	}
 
-	public void onReady(ReadyEvent event) { postWrappedEvent(	READY, event); }
+	public void onReady(ReadyEvent event) { postWrappedEvent(READY, event); }
 
 //	@Override
 //	public void onSessionInvalidate(SessionInvalidateEvent event) {
@@ -203,7 +207,6 @@ public class EventListeners extends ListenerAdapter {
 //	}
 
 
-
 	// Messages
 	public void onMessageReceived(MessageReceivedEvent event) { postWrappedEventWithExtra(MESSAGE_RECIEVED, event, event.getChannel().getIdLong()); }
 	public void onMessageUpdate(MessageUpdateEvent event) { postWrappedEventWithExtra(MESSAGE_EDITED, event, event.getChannel().getIdLong()); }
@@ -277,12 +280,11 @@ public class EventListeners extends ListenerAdapter {
 	}
 
 	public void onGuildReady(GuildReadyEvent event) {
-		if (Discord4KJSConfig.autofillDefaultGuild) {
+		if (Discord4KJSConfig.autofillDefaultGuild)
 			if (DiscordWrapper.defaultGuild != null)
 				DiscordWrapper.defaultGuild = event.getGuild();
 			else if (event.getJDA().getGuilds().size() > 1)
 				LGGR.warn("Discord4KJS is connected to more than one Discord Server! You should disable autofillDefaultGuild in {} to prevent the default guild changing between restarts", (Object) null/*TODO config file location*/);
-		}
 	}
 
 	public void onGuildJoin(GuildJoinEvent event) {
@@ -629,4 +631,22 @@ public class EventListeners extends ListenerAdapter {
 	public void onGuildStickerUpdateAvailable(GuildStickerUpdateAvailableEvent event) {
 		super.onGuildStickerUpdateAvailable(event);
 	}
+
+	@Override
+	public void handle(GenericEvent event) {
+		try {
+			onEvent(event);
+		} catch (Exception e) {
+			CONSOLE.error("Error while handling event from Discord: " + event, e);
+		}
+	}
+
+	@Override
+	public void register(Object listener) { throw new UnsupportedOperationException("Discord4KJS handles events, do not try overwrite this!"); }
+
+	@Override
+	public void unregister(Object listener) { throw new UnsupportedOperationException("Discord4KJS handles events, do not try overwrite this!"); }
+
+	@Override
+	public List<Object> getRegisteredListeners() { throw new UnsupportedOperationException("Discord4KJS handles events, do not try overwrite this!"); }
 }

@@ -9,21 +9,19 @@
     "ExtraThreadsShutdownMixin",
     "SkipScriptLoadingMixin",
 
-    // Annotations adders
-    "annotations.hidefromjs.JDAImpl",
-    "annotations.hidefromjs.IOUtil",
-    "annotations.hidefromjs.OkHttpClient$Builder",
-    "annotations.hidefromjs.Requester",
-    "annotations.hidefromjs.SessionConfig",
-    "annotations.hidefromjs.ShardingSessionConfig",
-    "annotations.remapforjs.Member",
-    "annotations.remapforjs.User",
+    // Hiding HTTP related stuff
+    "jda.HideHTTP.JDAImpl",
+    "jda.HideHTTP.IOUtil",
+    "jda.HideHTTP.OkHttpClient$Builder",
+    "jda.HideHTTP.Requester",
+    "jda.HideHTTP.SessionConfig",
+    "jda.HideHTTP.ShardingSessionConfig",
 
-    // Method adders
-    "methods.Guild",
-    "methods.User",
-    "methods.Member",
-    "methods.Channel"
+    // JDA stuff, renames and method adds
+    "jda.Guild",
+    "jda.UserSnowflakeMixin",
+    "jda.MemberMixin",
+    "jda.Channel"
   ],
   "injectors": {
     "defaultRequire": 1

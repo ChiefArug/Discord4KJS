@@ -1,4 +1,4 @@
-package chiefarug.mods.discord4kjs.mixin.methods;
+package chiefarug.mods.discord4kjs.mixin.jda;
 
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.RemapPrefixForJS;
@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-@RemapPrefixForJS("d4kjs$")
+@RemapPrefixForJS("discord4kjs$")
 @Mixin(value = net.dv8tion.jda.api.entities.channel.Channel.class, remap = false)
 public interface Channel extends net.dv8tion.jda.api.entities.channel.Channel {
 
@@ -16,7 +16,7 @@ public interface Channel extends net.dv8tion.jda.api.entities.channel.Channel {
 	ChannelType getType();
 
 	@Unique
-	default boolean d4kjs$isDm() {
+	default boolean discord4kjs$isDm() {
 		return getType() == ChannelType.PRIVATE;
 	}
 }

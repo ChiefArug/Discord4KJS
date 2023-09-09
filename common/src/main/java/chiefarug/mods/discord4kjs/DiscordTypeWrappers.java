@@ -2,13 +2,23 @@ package chiefarug.mods.discord4kjs;
 
 import dev.latvian.mods.kubejs.util.MapJS;
 import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.rhino.util.wrap.TypeWrapperFactory;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,56 +87,128 @@ public class DiscordTypeWrappers {
 		return null;
 	}
 
-	public static User user(Context _c, Object o) {
-		// we can't use jda() if not connected and typewrappers
-		// are likely to be used outside event blocks so we need to safeguard here
-		if (!isConnected()) return gracefullyRefuse();
-
-		if (o instanceof User u) {
-			return tryMember(u);
-		}
-		Long snowflake = asSnowflake(o);
-		if  (o != null) return tryMember(jda().getUserById(snowflake));
-		if (o instanceof CharSequence cs) return tryMember(jda().getUsersByName(cs.toString(), false).get(0));
-
-		return null;
-	}
+	// IMPORTANT:
+	// For all user related things, ALWAYS try to return as
+	// high up the chain of Member <- User <- UserSnowflake as
+	// possible, to make things easier on scripters.
 
 	public static Member member(Context _c, Object o) {
 		// we can't use jda() if not connected and typewrappers
 		// are likely to be used outside event blocks so we need to safeguard here
 		if (!isConnected()) return gracefullyRefuse();
 		// Would be nice if we could have some sort of guild 'context' so that we can use that
-		Guild guild = defaultGuild != null ? defaultGuild : null;
 
 		if (o instanceof Member m) return m;
-		if (o instanceof User u) return asMember(u, guild);
+		if (o instanceof User u) return asMember(u, defaultGuild);
 		User u = user(_c, o);
-		if (u != null) return asMember(u, guild);
+		if (u != null) return asMember(u, defaultGuild);
 
 		return null;
 	}
 
-	public static MessageChannel messageChannel(Context ctx, Object o) {
+	public static User user(Context _c, Object o) {
 		// we can't use jda() if not connected and typewrappers
 		// are likely to be used outside event blocks so we need to safeguard here
 		if (!isConnected()) return gracefullyRefuse();
 
-		if (o instanceof MessageChannel c) return c;
+		if (o instanceof User u) return tryMember(u);
 
 		Long snowflake = asSnowflake(o);
+		if  (o != null) {
+			User u = jda().getUserById(snowflake);
+			if (u != null) return tryMember(u);
+		}
+		if (o instanceof CharSequence cs) return tryMember(jda().getUsersByName(cs.toString(), false).get(0));
 
-		MessageChannel channel = jda().getChannelById(MessageChannel.class, snowflake);
+		return null;
+	}
+
+	public static UserSnowflake userSnowflake(Context ctx, Object o) {
+		// we can't use jda() if not connected and typewrappers
+		// are likely to be used outside event blocks so we need to safeguard here
+		if (!isConnected()) return gracefullyRefuse();
+
+		if (o instanceof Member m) return m;
+		if (o instanceof User u) return tryMember(u);
+		if (o instanceof UserSnowflake us) return us;
+
+		Long snowflake = asSnowflake(o);
+		if (snowflake == null) return null;
+
+
+		// This mess is to try and return a Member if possible, in case it makes its way back to the scripter.
+		// Probably not needed, we will see.
+		UserSnowflake userSnowflake = UserSnowflake.fromId(snowflake);
+		if (defaultGuild != null) {
+			Member m = defaultGuild.getMember(userSnowflake);
+			if (m != null) return m;
+		}
+		User u = jda().getUserById(userSnowflake.getIdLong());
+		if (u != null) return u;
+		return userSnowflake;
+	}
+
+	public static Channel channel(Context ctx, Object o) {
+		// we can't use jda() if not connected and typewrappers
+		// are likely to be used outside event blocks so we need to safeguard here
+		if (!isConnected()) return gracefullyRefuse();
+
+		if (o instanceof Channel c) return c;
+
+		Long snowflake = asSnowflake(o);
+		if (snowflake == null) return null;
+
+		Channel channel = jda().getPrivateChannelById(snowflake);
+		if (channel != null) return channel;
+		channel = jda().getGuildChannelById(snowflake);
 		if (channel != null) return channel;
 		// if its a user, use that users dms only if already open.
-		// if they arent open, ask for them to be opened only if we
-		// are allowed to block the thread (because that requires a request to discord)
+		// if they arent open, ask for them to be opened.i
+		// if we are allowed to block the thread then we can wait for that to happen
 		User user = (User) ctx.getTypeWrappers().getWrapperFactory(User.class, o).wrap(ctx, o);
 		if (user != null) {
 			if (user.hasPrivateChannel()) return user.openPrivateChannel().complete();
+			var ra = user.openPrivateChannel();
 			if (Discord4KJSConfig.blockThread)
-				return user.openPrivateChannel().complete();
+				ra.complete();
+			else
+				ra.queue();
 		}
+
+		return null;
+	}
+
+	public static ChannelTypeWrapperFactory<GuildChannel> guildChannel = new ChannelTypeWrapperFactory<>(GuildChannel.class);
+	public static ChannelTypeWrapperFactory<MessageChannel> messageChannel = new ChannelTypeWrapperFactory<>(MessageChannel.class);
+	public static ChannelTypeWrapperFactory<ForumChannel> forumChannel = new ChannelTypeWrapperFactory<>(ForumChannel.class);
+	public static ChannelTypeWrapperFactory<NewsChannel> newsChannel = new ChannelTypeWrapperFactory<>(NewsChannel.class);
+	public static ChannelTypeWrapperFactory<AudioChannel> audioChannel = new ChannelTypeWrapperFactory<>(AudioChannel.class);
+	public static ChannelTypeWrapperFactory<StageChannel> stageChannel = new ChannelTypeWrapperFactory<>(StageChannel.class);
+	public static ChannelTypeWrapperFactory<VoiceChannel> voiceChannel = new ChannelTypeWrapperFactory<>(VoiceChannel.class);
+
+	static class ChannelTypeWrapperFactory<T extends Channel> implements TypeWrapperFactory<T> {
+		private final Class<T> type;
+
+		ChannelTypeWrapperFactory(Class<T> type) {
+			this.type = type;
+		}
+
+		@Override
+		public T wrap(Context ctx, Object o) {
+			Channel channel = (Channel) ctx.getTypeWrappers().getWrapperFactory(Channel.class, o).wrap(ctx, o);
+			if (type.isInstance(channel)) return type.cast(channel);
+
+			return null;
+		}
+	}
+
+	public static ForumChannel forumChannel(Context ctx, Object o) {
+		// we can't use jda() if not connected and typewrappers
+		// are likely to be used outside event blocks so we need to safeguard here
+		if (!isConnected()) return gracefullyRefuse();
+
+		Channel channel = (Channel) ctx.getTypeWrappers().getWrapperFactory(Channel.class, o).wrap(ctx, o);
+		if (channel instanceof ForumChannel m) return m;
 
 		return null;
 	}

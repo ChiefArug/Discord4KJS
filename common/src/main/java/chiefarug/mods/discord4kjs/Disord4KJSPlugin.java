@@ -13,7 +13,14 @@ import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.JDAImpl;
 import net.dv8tion.jda.internal.entities.UserSnowflakeImpl;
@@ -48,9 +55,16 @@ public class Disord4KJSPlugin extends KubeJSPlugin {
 	public void registerTypeWrappers(ScriptType type, TypeWrappers event) {
 		event.register(Activity.class, DiscordTypeWrappers::activity);
 		event.register(Guild.class, DiscordTypeWrappers::guild);
-		event.register(User.class, DiscordTypeWrappers::user);
-		event.register(MessageChannel.class, DiscordTypeWrappers::messageChannel);
+		event.register(Channel.class, DiscordTypeWrappers::channel);
+		event.register(GuildChannel.class, DiscordTypeWrappers.guildChannel);
+		event.register(MessageChannel.class, DiscordTypeWrappers.messageChannel);
+ 		event.register(ForumChannel.class, DiscordTypeWrappers.forumChannel);
+		event.register(NewsChannel.class, DiscordTypeWrappers.newsChannel);
+		event.register(AudioChannel.class, DiscordTypeWrappers.audioChannel);
+ 		event.register(StageChannel.class, DiscordTypeWrappers.stageChannel);
+ 		event.register(VoiceChannel.class, DiscordTypeWrappers.voiceChannel);
 		event.register(ISnowflake.class, DiscordTypeWrappers::snowflake);
+		event.register(User.class, DiscordTypeWrappers::user);
 		event.register(Member.class, DiscordTypeWrappers::member);
 	}
 
