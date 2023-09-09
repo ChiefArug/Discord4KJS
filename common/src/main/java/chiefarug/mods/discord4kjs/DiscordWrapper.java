@@ -197,7 +197,7 @@ public class DiscordWrapper {
 	@Info("""
 		Gets the bots dms with the specified user. This will return null unless dms are already open with the user, or we are allowed to halt the thread to wait for them to open
 		
-		
+		Use Discord.enableDms if you want to open them and send a message even if they are currently closed.
 		""")
 	public static PrivateChannel getDms(User user) {
 		if (areDmsEnabled(user) || Discord4KJSConfig.blockThread) return enableDms(user).complete();

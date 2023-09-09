@@ -7,7 +7,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 //TODO: actually implement this
-//TODO: config option to not send certain events if the bot is the sender?
 public class Discord4KJSConfig {
 
 	// If the thread is allowed to be blocked to wait for requests to discord to complete.
@@ -43,5 +42,5 @@ public class Discord4KJSConfig {
 	// AUTO_MODERATION_CONFIGURATION // Events related to AutoModRule changes.
 	// AUTO_MODERATION_EXECUTION // Events related to AutoModResponse triggers.
 	// TODO: CacheFlags?
-	public static EnumSet<GatewayIntent> intents = EnumSet.of(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_REACTIONS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES);
+	public static EnumSet<GatewayIntent> intents = EnumSet.of(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_REACTIONS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGE_REACTIONS);
 }

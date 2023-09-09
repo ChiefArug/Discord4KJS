@@ -38,4 +38,9 @@ public abstract class ReactionEventJS extends ContentlessMessageEventJS {
 	public String getEmojiString() {
 		return emoji.getFormatted();
 	}
+
+	@Info("Returns the user that added the reaction")
+	public User getUser() {
+		return user;
+	}
 }
