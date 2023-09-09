@@ -10,12 +10,12 @@
     "SkipScriptLoadingMixin",
 
     // Hiding HTTP related stuff
-    "jda.HideHTTP.JDAImpl",
-    "jda.HideHTTP.IOUtil",
-    "jda.HideHTTP.OkHttpClient$Builder",
-    "jda.HideHTTP.Requester",
-    "jda.HideHTTP.SessionConfig",
-    "jda.HideHTTP.ShardingSessionConfig",
+    "jda.HideHTTP$JDAImpl",
+    "jda.HideHTTP$IOUtil",
+    "jda.HideHTTP$OkHttpClient$Builder",
+    "jda.HideHTTP$Requester",
+    "jda.HideHTTP$SessionConfig",
+    "jda.HideHTTP$ShardingSessionConfig",
 
     // JDA stuff, renames and method adds
     "jda.Guild",
