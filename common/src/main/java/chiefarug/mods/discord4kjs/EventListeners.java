@@ -6,6 +6,7 @@ import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.script.ScriptTypeHolder;
 import net.dv8tion.jda.api.entities.channel.forums.ForumTag;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -206,6 +207,11 @@ public class EventListeners extends ListenerAdapter implements IEventManager {
 //		super.onUserTyping(event);
 //	}
 
+	private String emojiId(EmojiUnion emoji) {
+		if (emoji.getType() == Emoji.Type.CUSTOM)
+			return emoji.asCustom().getId();
+		return emoji.getName();
+	}
 
 	// Messages
 	public void onMessageReceived(MessageReceivedEvent event) { postWrappedEventWithExtra(MESSAGE_RECIEVED, event, event.getChannel().getIdLong()); }
@@ -213,8 +219,8 @@ public class EventListeners extends ListenerAdapter implements IEventManager {
 	public void onMessageDelete(MessageDeleteEvent event) { postWrappedEventWithExtra(MESSAGE_DELETED, event, event.getChannel().getIdLong()); }
 	public void onMessageBulkDelete(MessageBulkDeleteEvent event) { postWrappedEventWithExtra(MESSAGES_BULK_DELETED, event, event.getChannel().getIdLong()); }
 	public void onMessageEmbed(MessageEmbedEvent event) { postWrappedEventWithExtra(MESSAGE_EMBED_ADDED, event, event.getChannel().getIdLong()); }
-	public void onMessageReactionAdd(MessageReactionAddEvent event) { postWrappedEventWithExtra(REACTION_ADDED, event, event.getEmoji().getName());}
-	public void onMessageReactionRemove(MessageReactionRemoveEvent event) { postWrappedEventWithExtra(REACTION_REMOVED, event, event.getEmoji().getName());}
+	public void onMessageReactionAdd(MessageReactionAddEvent event) { postWrappedEventWithExtra(REACTION_ADDED, event, emojiId(event.getEmoji()));}
+	public void onMessageReactionRemove(MessageReactionRemoveEvent event) { postWrappedEventWithExtra(REACTION_REMOVED, event, emojiId(event.getEmoji()));}
 
 //	@Override
 //	public void onMessageReactionRemoveAll(MessageReactionRemoveAllEvent event) {super.onMessageReactionRemoveAll(event);}
