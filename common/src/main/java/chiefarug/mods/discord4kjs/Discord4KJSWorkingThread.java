@@ -3,7 +3,6 @@ package chiefarug.mods.discord4kjs;
 import com.google.common.base.Stopwatch;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
 import java.time.Duration;
@@ -38,12 +37,12 @@ public class Discord4KJSWorkingThread extends Thread {
 		running = false;
 
 		var disconnectTimer = Stopwatch.createStarted();
-		LGGR.info("Disconnecting from Discord");
+		LGGR.info("Disconnecting from Discord. Will wait {} milliseconds before force quitting!", Discord4KJSConfig.shutdownDelay);
 		jda().shutdown();
 
 		try {
-			if (!jda().awaitShutdown(Duration.ofMillis(Discord4KJSConfig.waitForShutdown))) {
-				LGGR.warn("Wasn't able to disconnect nicely from Discord within {}ms, forcing shutdown immediately (this will skip any queued requests!)", Discord4KJSConfig.waitForShutdown);
+			if (!jda().awaitShutdown(Duration.ofMillis(Discord4KJSConfig.shutdownDelay))) {
+				LGGR.warn("Wasn't able to disconnect nicely from Discord within {}ms, forcing shutdown immediately (this will skip any queued requests!)", Discord4KJSConfig.shutdownDelay);
 				jda().shutdownNow();
 			} else {
 				LGGR.info("Disconnected from Discord in {}", disconnectTimer.stop());
