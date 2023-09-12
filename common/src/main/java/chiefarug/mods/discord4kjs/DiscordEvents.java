@@ -32,7 +32,7 @@ public interface DiscordEvents {
 	// Lifecycle events
 	// These probably aren't terribly handy, but they exist
 	EventHandler READY = GROUP.startup("botReady", () -> BotReadyEventJS.class);
-	EventHandler DISCONNECTED = event("disconnected", DisconnectEventJS.class);
+	EventHandler DISCONNECTED = GROUP.startup("disconnected", () -> DisconnectEventJS.class);
 
 
 	// User update events
