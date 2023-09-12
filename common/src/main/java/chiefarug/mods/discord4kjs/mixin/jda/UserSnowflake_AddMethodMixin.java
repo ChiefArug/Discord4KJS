@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Unique;
 
 @RemapPrefixForJS("discord4kjs$")
 @Mixin(value = UserSnowflake.class, remap = false)
-public interface UserSnowflakeMixin extends ISnowflake {
+public interface UserSnowflake_AddMethodMixin extends ISnowflake {
 	@Unique
 	default boolean discord4kjs$isSelf() {
 		return DiscordWrapper.getSelf().getIdLong() == getIdLong();

@@ -18,10 +18,10 @@
     "jda.HideHTTP$ShardingSessionConfig",
 
     // JDA stuff, renames and method adds
-    "jda.Guild",
-    "jda.UserSnowflakeMixin",
-    "jda.MemberMixin",
-    "jda.Channel"
+    "jda.Guild_AddMethodsMixin",
+    "jda.UserSnowflake_AddMethodMixin",
+    "jda.Member_ImplementUserMixin",
+    "jda.Channel_AddMethodsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

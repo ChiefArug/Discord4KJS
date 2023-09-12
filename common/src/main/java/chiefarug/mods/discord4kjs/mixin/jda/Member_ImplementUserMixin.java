@@ -17,7 +17,7 @@ import java.util.List;
 
 @RemapPrefixForJS("discord4kjs$")
 @Mixin(value = net.dv8tion.jda.api.entities.Member.class, remap = false)
-public interface MemberMixin extends User, Member {
+public interface Member_ImplementUserMixin extends User, Member {
 
 	@Override
 	@RemapForJS("getUsername")
@@ -114,7 +114,7 @@ public interface MemberMixin extends User, Member {
 
 	@Override
 	default EnumSet getFlags() {
-		throw new IllegalCallerException(" Cannot call Memeber#getFlags due to ambiguity. Use Member#discord4kjs$getMemberFlags instead!");
+		throw new IllegalCallerException("Cannot call Memeber#getFlags due to ambiguity. Use Member#discord4kjs$getMemberFlags instead!");
 	}
 
 	@Unique
