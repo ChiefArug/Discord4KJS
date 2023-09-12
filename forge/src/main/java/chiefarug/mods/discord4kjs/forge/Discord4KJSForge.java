@@ -9,6 +9,5 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class Discord4KJSForge {
     public Discord4KJSForge() {
         EventBuses.registerModEventBus(Discord4KJS.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
-        Discord4KJS.init();
     }
 }

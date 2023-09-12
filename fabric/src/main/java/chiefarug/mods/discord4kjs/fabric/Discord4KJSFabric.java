@@ -5,7 +5,5 @@ import net.fabricmc.api.ModInitializer;
 
 public class Discord4KJSFabric implements ModInitializer {
     @Override
-    public void onInitialize() {
-        Discord4KJS.init();
-    }
+    public void onInitialize() {}
 }

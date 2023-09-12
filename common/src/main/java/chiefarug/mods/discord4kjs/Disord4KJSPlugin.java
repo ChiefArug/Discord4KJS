@@ -32,7 +32,9 @@ import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 public class Disord4KJSPlugin extends KubeJSPlugin {
 	@Override
 	public void init() {
-		DiscordEvents.GROUP.register();
+		//TODO: load config here, then maybe conditionally register events based on intents?
+		DiscordEvents.register();
+		Discord4KJS.init();
 	}
 
 	@Override
@@ -70,6 +72,7 @@ public class Disord4KJSPlugin extends KubeJSPlugin {
 
 	private void serverBindings(BindingsEvent event) {
 		event.add("Discord", DiscordWrapper.class);
+		//TODO add binding and helper methods for net.dv8tion.jda.api.Permission
 	}
 
 	@Override
