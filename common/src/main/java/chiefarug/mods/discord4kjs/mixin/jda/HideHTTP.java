@@ -1,6 +1,7 @@
 package chiefarug.mods.discord4kjs.mixin.jda;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
+import dev.latvian.mods.rhino.annotations.JSConstructor;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.internal.requests.WebSocketClient;
@@ -11,14 +12,18 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.List;
 
 public class HideHTTP {
+	@HideFromJS
 	@Mixin(value = net.dv8tion.jda.internal.utils.IOUtil.class, remap = false)
-	public abstract static class IOUtil {
-		@Shadow @HideFromJS public static OkHttpClient.Builder newHttpClientBuilder() {return null;};
-	}
+	public abstract static class IOUtil {}
 
 	@Mixin(value = net.dv8tion.jda.internal.utils.config.sharding.ShardingSessionConfig.class, remap = false)
 	public abstract static class ShardingSessionConfig {
-		@Shadow @HideFromJS public abstract OkHttpClient.Builder getHttpBuilder();
+		@Shadow @HideFromJS public abstract okhttp3.OkHttpClient.Builder getHttpBuilder();
+	}
+
+	@Mixin(value = net.dv8tion.jda.internal.utils.config.SessionConfig.class, remap = false)
+	public abstract static class SessionConfig {
+		@Shadow @HideFromJS public abstract OkHttpClient getHttpClient();
 	}
 
 	@Mixin(value = net.dv8tion.jda.internal.requests.Requester.class, remap = false)
@@ -39,14 +44,12 @@ public class HideHTTP {
 		@Shadow @HideFromJS public abstract void setEventManager(IEventManager eventManager);
 	}
 
-	@Mixin(value = OkHttpClient.Builder.class, remap = false)
+	@HideFromJS
+	@Mixin(value = okhttp3.OkHttpClient.Builder.class, remap = false)
 	public abstract static class OkHttpClient$Builder {
-		// just in case you get your hands on a builder from somewhere I missed
-		@Shadow @HideFromJS public abstract OkHttpClient build();
 	}
 
-	@Mixin(value = net.dv8tion.jda.internal.utils.config.SessionConfig.class, remap = false)
-	public abstract static class SessionConfig {
-		@Shadow @HideFromJS public abstract OkHttpClient getHttpClient();
-	}
+	@HideFromJS
+	@Mixin(value = okhttp3.OkHttpClient.class, remap = false)
+	public abstract static class OkHttpClient {}
 }
