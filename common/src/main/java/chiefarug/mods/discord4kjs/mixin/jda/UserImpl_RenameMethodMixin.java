@@ -6,12 +6,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(value = UserImpl.class, remap = false)
-public abstract class User_RenameMethodsMixin implements net.dv8tion.jda.api.entities.User {
+public abstract class UserImpl_RenameMethodMixin implements net.dv8tion.jda.api.entities.User {
 	@Shadow
 	@RemapForJS("getUsername")
 	public abstract String getName();
-
-	@Shadow
-	@RemapForJS("getName")
-	public abstract String getEffectiveName();
 }

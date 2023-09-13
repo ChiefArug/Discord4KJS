@@ -1,7 +1,6 @@
 package chiefarug.mods.discord4kjs.mixin.jda;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
-import dev.latvian.mods.rhino.annotations.JSConstructor;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import net.dv8tion.jda.api.hooks.IEventManager;
 import net.dv8tion.jda.internal.requests.WebSocketClient;
@@ -18,7 +17,7 @@ public class HideHTTP {
 
 	@Mixin(value = net.dv8tion.jda.internal.utils.config.sharding.ShardingSessionConfig.class, remap = false)
 	public abstract static class ShardingSessionConfig {
-		@Shadow @HideFromJS public abstract okhttp3.OkHttpClient.Builder getHttpBuilder();
+		@Shadow @HideFromJS public abstract OkHttpClient.Builder getHttpBuilder();
 	}
 
 	@Mixin(value = net.dv8tion.jda.internal.utils.config.SessionConfig.class, remap = false)
@@ -51,5 +50,5 @@ public class HideHTTP {
 
 	@HideFromJS
 	@Mixin(value = okhttp3.OkHttpClient.class, remap = false)
-	public abstract static class OkHttpClient {}
+	public abstract static class _OkHttpClient {}
 }

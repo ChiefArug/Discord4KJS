@@ -1,6 +1,5 @@
 package chiefarug.mods.discord4kjs;
 
-import chiefarug.mods.discord4kjs.util.RestActionJS;
 import dev.latvian.mods.kubejs.typings.Info;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
