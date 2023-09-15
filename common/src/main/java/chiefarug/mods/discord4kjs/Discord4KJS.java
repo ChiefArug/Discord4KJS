@@ -2,7 +2,6 @@ package chiefarug.mods.discord4kjs;
 
 import chiefarug.mods.discord4kjs.markdown.Parser;
 import chiefarug.mods.discord4kjs.markdown.Unparser;
-import chiefarug.mods.discord4kjs.util.SetAndForget;
 import com.google.common.base.Stopwatch;
 import com.mojang.logging.LogUtils;
 import dev.architectury.platform.Platform;
@@ -27,6 +26,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import static net.dv8tion.jda.api.utils.MemberCachePolicy.ALL;
 
@@ -39,15 +39,16 @@ public class Discord4KJS {
     public transient static ConsoleJS CONSOLE = new ConsoleJS(ScriptType.SERVER, LGGR);
     private static Parser markdownParser = new Parser();
 	private static Unparser markdownUnparser = new Unparser();
-    static final SetAndForget<JDA> jda = new SetAndForget<>();
+    static JDA jda = null;
 
 	public static boolean isConnected() {
-		return jda.isSet() && jda().getStatus() == JDA.Status.CONNECTED;
+		return jda != null && jda().getStatus() == JDA.Status.CONNECTED;
 	}
 
     @HideFromJS
     public static final JDA jda() {
-        return jda.get();
+		if (jda == null) throw new IllegalStateException("Discord4KJS hasn't loaded yet/failed to load but someone is still trying to access it!");
+        return jda;
     }
 
     @HideFromJS
@@ -115,7 +116,7 @@ public class Discord4KJS {
     static boolean connectToDiscord(JDABuilder jdab) {
 		var loginTimer = Stopwatch.createStarted();
 		LGGR.info("Connecting to Discord...");
-		JDA jda = jdab.build();
+		Discord4KJS.jda = jdab.build();
 		try {
 			jda.awaitReady();
 		} catch (InterruptedException e) {
@@ -123,7 +124,6 @@ public class Discord4KJS {
 			return false;
 		}
 		LGGR.info("Connected to Discord in {}", loginTimer.stop());
-		Discord4KJS.jda.set(jda);
 		return true;
 	}
 
