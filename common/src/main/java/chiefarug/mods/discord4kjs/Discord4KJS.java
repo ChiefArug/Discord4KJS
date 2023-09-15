@@ -53,6 +53,7 @@ public class Discord4KJS {
 
     @HideFromJS
     public static void init() {
+		// TODO: try have classloading barrier if no valid token is found, so that we don't eat up ram/performance with JDA
         new Discord4KJSWorkingThread().start();
 		RestAction.setDefaultFailure(error -> CONSOLE.error("Error while sending request to Discord", error));
 		if (Discord4KJSConfig.logSuccessfulRequests.get()) {

@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 import static chiefarug.mods.discord4kjs.Discord4KJS.MODID;
@@ -21,35 +22,28 @@ import static chiefarug.mods.discord4kjs.Discord4KJS.MODID;
 public class Discord4KJSConfig {
 
 	public static final Path CONFIG = KubeJSPaths.CONFIG.resolve("discord4kjs.properties");
-	private static Configger configger = new Configger(MODID, CONFIG, new HashMap<>());
+	private static Configger configger = new Configger(MODID, CONFIG, new LinkedHashMap<>(5));
 
 	public static void load() {
 		configger.load();
-
-//		blockThread = get("blockThread", false); // This is probably a bad idea. Let them enter callback hell anyway
-
 	}
 
-	//
-	//
-	//
 	public static ConfigValue<Boolean> blockThread = configger.booleanValue("blockThread", false,
-			"If the thread is allowed to be blocked to wait for requests to discord to complete.",
-			"Disabling this will cause some features to be disabled, but will also result in a more stable experience",
-			"If you wish to enable this you MUST do this through scripts."
+			"If the main thread is allowed to be blocked to wait for requests to discord to complete.",
+			"Disabling this will cause some features to be disabled, but will also result in a more stable experience"
 	);
 
 	public static ConfigValue<Boolean> autofillDefaultGuild = configger.booleanValue("autofillDefaultGuild", true,
 			"If the default guild (used for things such as getting channels without having to provide a guild) should be",
 			"automatically set to the first guild that we connect to. Useful for bots that are only in one server.",
 			"Note that there is no guarantee that guilds will be connected to in the same order each start so this should be",
-			"false for bots that are in more than one server."
+			"false for bots that are in more than one server, or I will yell at you."
 	);
 
 	public static ConfigValue<Integer> shutdownDelay = configger.integerValue("shutdownDelay", 500,
 			"The amount of time that we should wait to disconnect from Discord when Minecraft closes.",
-			"Note this will stop Minecraft from closing until we disconnect or we have waited this long, so should be used with caution",
-			"If 0 or less we will not wait at all, meaning that"
+			"Note this will stop Minecraft from closing until we disconnect or we have waited this long, so should be used with caution.",
+			"If 0 or less we will not wait at all, meaning that any currently queued requests to Discord may not send."
 	);
 
 	public static ConfigValue<Boolean> logSuccessfulRequests = configger.booleanValue("logSuccessfulRequests", false,
@@ -61,7 +55,7 @@ public class Discord4KJSConfig {
 	public static ConfigValue<EnumSet<GatewayIntent>> intents = configger.enumSetValue("intents", EnumSet.of(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_REACTIONS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGE_REACTIONS), GatewayIntent.class,
 			"A list of intents used to tell Discord what events and other information we want to recieve",
 			"Note that GUILD_PRESENCES, GUILD_MEMBERS and MESSAGE_CONTENT need to also be enabled on the Discord Developer bot page as they are privleged intents",
-			"Possible values:",
+			"Possible values:", // TODO: say which JS events are affected here.
 			"GUILD_MEMBERS // Events which inform us about member update/leave/join of a guild. This is required to cache all members of a guild.",
 			"GUILD_MODERATION // Moderation events, such as ban/unban/audit-log.",
 			"GUILD_EMOJIS_AND_STICKERS // Custom emoji and sticker add/update/delete events.",

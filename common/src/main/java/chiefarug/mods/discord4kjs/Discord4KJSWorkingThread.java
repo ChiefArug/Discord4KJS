@@ -63,6 +63,7 @@ public class Discord4KJSWorkingThread extends Thread {
 			running = false;
 			return;
 		}
+		Discord4KJSConfig.load();
 
 
 		while (running) {

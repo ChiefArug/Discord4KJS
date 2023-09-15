@@ -1,9 +1,8 @@
 package chiefarug.mods.discord4kjs.config;
 
+import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
 import dev.architectury.platform.Platform;
-import dev.latvian.mods.rhino.CustomFunction;
-import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,20 +32,27 @@ import java.util.stream.Collectors;
  * @author ChiefArug
  * @param name The name that should be used to describe the config, usually a modid.
  * @param location The full path of the config file.
- * @param _valueMap A new, empty hash map. This is a workaround to making our own so this can still be a record. Don't touch it plsthanks
+ * @param _valueMap A new empty map.
+ *                  Reccomended to be a LinkedHashMap so that order of insertion is preserved.
+ *                  This is a workaround to making our own in a private field so this can still be a record.
+ *                  Don't touch it plsthanks
  */
 public record Configger(String name, Path location, Map<String, ConfigValue<?>> _valueMap) {
 	private static final Logger CLOGGER = LogUtils.getLogger();
 	public static final Path MC_ROOT = Platform.getGameFolder();
 
-	public <V> ConfigValue<V> value(String name, V defaultValue, ConfigValueReader<V> reader, String ...comments) {
+	public <V> ConfigValue<V> value(String name, V defaultValue, ConfigValueReader<V> reader, ConfigValueWriter<V> writer, String[] comments) {
 		name = name.trim();
 		validateName(name);
 
-		ConfigValue<V> cv = new ConfigValue<>(name, defaultValue, reader, comments);
+		ConfigValue<V> cv = new ConfigValue<>(name, defaultValue, reader, writer, comments);
 		_valueMap.put(name, cv);
 		return cv;
 	}
+	public <V> ConfigValue<V> value(String name, V defaultValue, ConfigValueReader<V> reader, String ...comments) {
+		return value(name, defaultValue, reader, (ConfigValueWriter<V>) ConfigValueWriter.DEFAULT, comments);
+	}
+
 	public ConfigValue<Boolean> booleanValue(String name, boolean defaultvalue, String ...comments) {
 		return value(name, defaultvalue, ConfigValueReader.BOOLEAN_READER, comments);
 	}
@@ -59,10 +66,10 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 		return value(name, defaultValue, ConfigValueReader.fromEnum(defaultValue.getClass()), comments);
 	}
 	public <T> ConfigValue<List<T>> listValue(String name, List<T> defaultValues,ConfigValueReader<T> innerReader, String ...comments) {
-		return value(name, defaultValues, ConfigValueReader.asList(innerReader), comments);
+		return value(name, defaultValues, ConfigValueReader.asList(innerReader), ConfigValueWriter.DEFAULT_COLLECTION.cast(), comments);
 	}
 	public <E extends Enum<E>> ConfigValue<EnumSet<E>> enumSetValue(String name, EnumSet<E> defaultValues, Class<E> enumClass, String ...comments) {
-		return value(name, defaultValues, ConfigValueReader.enumSet(enumClass), comments);
+		return value(name, defaultValues, ConfigValueReader.enumSet(enumClass), ConfigValueWriter.ENUM_COLLECTION.cast(), comments);
 	}
 
 	private boolean validateName(String name) {
@@ -83,8 +90,11 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 		private String[] comments;
 
 		// Use the methods in Configger!
-		private ConfigValue(String name, V defaultValue, ConfigValueReader<V> reader, String ...comments) {
+		private ConfigValue(String name, V defaultValue, ConfigValueReader<V> reader, ConfigValueWriter<V> writer, String ...comments) {
+			this.name = name;
 			this.defaultValue = defaultValue;
+			this.reader = reader;
+			this.writer = writer;
 			this.comments = comments;
 		}
 
@@ -93,7 +103,7 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 				out.write("# " + comment);
 				out.write(System.lineSeparator());
 			}
-			out.write(name + "=" + writer.apply(value));
+			out.write(name + "=" + writer.apply(get()));
 		}
 
 		protected void set(String value) {
@@ -108,12 +118,17 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 
 	@FunctionalInterface
 	public interface ConfigValueWriter<T> extends Function<T, String> {
-		public static final ConfigValueWriter<Object> DEFAULT = v -> String.valueOf(v);
+		public static final ConfigValueWriter<? extends Object> DEFAULT = v -> String.valueOf(v);
 		public static final ConfigValueWriter<Enum<? extends Enum<?>>> ENUM = e -> e.name();
+		public static final ConfigValueWriter<? extends Collection<?>> DEFAULT_COLLECTION = asCollection(DEFAULT);
+		public static final ConfigValueWriter<? extends Collection<?>> ENUM_COLLECTION = asCollection(ENUM);
 		public static <T> ConfigValueWriter<Collection<T>> asCollection(ConfigValueWriter<T> inner) {
 			return v -> v.stream()
 					.map(inner)
 					.collect(Collectors.joining(", "));
+		}
+		default <V> ConfigValueWriter<V> cast() {
+			return (ConfigValueWriter<V>) this; // Grumble grumble generics
 		}
 	}
 
@@ -212,10 +227,13 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 		}
 		try {
 			var writer = new BufferedWriter(new FileWriter(location.toFile(), true));
+			writer.write(name + " config file");
+			writer.newLine();
 			for (ConfigValue<?> value : toWrite) {
 				writer.newLine();
 				value.write(writer);
 			}
+			writer.flush();
 		} catch (IOException e) {
 			CLOGGER.error("Failed saving {} config file to {}. {}", name, location, e);
 		}
