@@ -103,7 +103,6 @@ public class EventListeners extends ListenerAdapter implements IEventManager {
 	private void postWrappedEvent(EventHandler handler, GenericEvent event) {
 		postWrappedEventWithExtra(handler, event, null);
 	}
-	static transient boolean hi;
 
 	private void postWrappedEventWithExtra(EventHandler handler, GenericEvent event, Object extra) {
 		if (handler.hasListeners()) {
@@ -286,7 +285,7 @@ public class EventListeners extends ListenerAdapter implements IEventManager {
 	}
 
 	public void onGuildReady(GuildReadyEvent event) {
-		if (Discord4KJSConfig.autofillDefaultGuild)
+		if (Discord4KJSConfig.autofillDefaultGuild.get())
 			if (DiscordWrapper.defaultGuild != null)
 				DiscordWrapper.defaultGuild = event.getGuild();
 			else if (event.getJDA().getGuilds().size() > 1)

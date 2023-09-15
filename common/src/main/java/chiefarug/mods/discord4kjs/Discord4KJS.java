@@ -14,15 +14,17 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.internal.JDAImpl;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Helpers;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -32,7 +34,7 @@ public class Discord4KJS {
 
     static final Path TOKEN_PATH = KubeJSPaths.LOCAL.resolve("discord4kjs.token.txt");
 	static final Path TOKEN_PATH_DISPLAY = Platform.getGameFolder().relativize(TOKEN_PATH);
-    public static final String MOD_ID = "discord4kjs";
+    public static final String MODID = "discord4kjs";
     public static final Logger LGGR = LogUtils.getLogger();
     public transient static ConsoleJS CONSOLE = new ConsoleJS(ScriptType.SERVER, LGGR);
     private static Parser markdownParser = new Parser();
@@ -40,7 +42,7 @@ public class Discord4KJS {
     static final SetAndForget<JDA> jda = new SetAndForget<>();
 
 	public static boolean isConnected() {
-		return jda().getStatus() == JDA.Status.CONNECTED;
+		return jda.isSet() && jda().getStatus() == JDA.Status.CONNECTED;
 	}
 
     @HideFromJS
@@ -48,10 +50,13 @@ public class Discord4KJS {
         return jda.get();
     }
 
-
     @HideFromJS
     public static void init() {
         new Discord4KJSWorkingThread().start();
+		RestAction.setDefaultFailure(error -> CONSOLE.error("Error while sending request to Discord", error));
+		if (Discord4KJSConfig.logSuccessfulRequests.get()) {
+			RestAction.setDefaultSuccess(o -> CONSOLE.info("Request succsfully sent to Discord! Recieved: " + o));
+		}
     }
 
     public static Component parseMarkdown(String stringWithMarkdown) {
@@ -65,13 +70,23 @@ public class Discord4KJS {
     @NotNull
 	private static String readToken() {
 		String token = "";
-		try {
-			var tokenFile = TOKEN_PATH.toFile();
-			if (!tokenFile.exists()) {
+		var tokenFile = TOKEN_PATH.toFile();
+		if (!tokenFile.exists()) {
+			try (BufferedWriter writer = new BufferedWriter(new FileWriter(tokenFile))) {
 				tokenFile.createNewFile();
+				writer.append(System.lineSeparator()) // Blank line for token
+						.append("Put your token on the line above. The token should end just about here ^ if you are using a monospace font").append(System.lineSeparator())
+						.append("Text on lines after the token (like this one) are ignored.").append(System.lineSeparator())
+						.append("DO NOT COMMIT, EXPORT OR OTHERWISE SHARE THIS FILE").append(System.lineSeparator())
+						.append("If you do, regenerate the token at https://discord.com/developers/applications/");
 				LGGR.info("Discord4KJS token file created at {}", TOKEN_PATH_DISPLAY);
+			} catch (IOException e) {
+				LGGR.error("Error while trying to write a blank Discord4KJS bot token file to {}. {}", TOKEN_PATH_DISPLAY, e);
 			}
-			token = new BufferedReader(new FileReader(tokenFile)).readLine();
+			return token; // Exit early. We just wrote the file, so reading it now is pointless
+		}
+		try (BufferedReader reader = new BufferedReader(new FileReader(tokenFile))) {
+			token = reader.readLine();
 			token = token != null ? token.trim() : "";
 			if (token.isEmpty()) {
 				LGGR.warn("No valid token in Discord4KJS token file at {}. Discord4KJS will not load", TOKEN_PATH_DISPLAY);
@@ -89,7 +104,7 @@ public class Discord4KJS {
         String token = readToken();
 		if (token.isEmpty()) return null;
 
-		JDABuilder builder = JDABuilder.create(token, Discord4KJSConfig.intents);
+		JDABuilder builder = JDABuilder.create(token, Discord4KJSConfig.intents.get());
 		builder.setActivity(Activity.competing("the most jank Discord bot api setup")); // config?
 		builder.setEventManager(new EventListeners());
 		builder.setMemberCachePolicy(ALL); //todo make this a config option
@@ -97,7 +112,7 @@ public class Discord4KJS {
 		return builder;
 	}
 
-    static void connectToDiscord(JDABuilder jdab) {
+    static boolean connectToDiscord(JDABuilder jdab) {
 		var loginTimer = Stopwatch.createStarted();
 		LGGR.info("Connecting to Discord...");
 		JDA jda = jdab.build();
@@ -105,10 +120,11 @@ public class Discord4KJS {
 			jda.awaitReady();
 		} catch (InterruptedException e) {
 			LGGR.error("Error while waiting for JDA to connect to Discord. Aborting!", e);
-			return;
+			return false;
 		}
 		LGGR.info("Connected to Discord in {}", loginTimer.stop());
 		Discord4KJS.jda.set(jda);
+		return true;
 	}
 
 	public static String getJumpUrl(String messageId, String channelId, String guildId) {

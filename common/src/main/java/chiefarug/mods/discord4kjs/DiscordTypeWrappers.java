@@ -169,7 +169,7 @@ public class DiscordTypeWrappers {
 		if (user != null) {
 			if (user.hasPrivateChannel()) return user.openPrivateChannel().complete();
 			var ra = user.openPrivateChannel();
-			if (Discord4KJSConfig.blockThread)
+			if (Discord4KJSConfig.blockThread.get())
 				ra.complete();
 			else
 				ra.queue();

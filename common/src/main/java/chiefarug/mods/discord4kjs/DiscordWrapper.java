@@ -199,7 +199,7 @@ public class DiscordWrapper {
 		Use Discord.enableDms if you want to open them and send a message even if they are currently closed.
 		""")
 	public static PrivateChannel getDms(User user) {
-		if (areDmsEnabled(user) || Discord4KJSConfig.blockThread) return enableDms(user).complete();
+		if (areDmsEnabled(user) || Discord4KJSConfig.blockThread.get()) return enableDms(user).complete();
 		return null;
 	}
 

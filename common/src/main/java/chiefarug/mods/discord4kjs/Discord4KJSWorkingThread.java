@@ -34,6 +34,7 @@ public class Discord4KJSWorkingThread extends Thread {
 	}
 
 	public static void shutdown() throws InterruptedException {
+		if (!running) return;
 		running = false;
 
 		var disconnectTimer = Stopwatch.createStarted();
@@ -41,7 +42,7 @@ public class Discord4KJSWorkingThread extends Thread {
 		jda().shutdown();
 
 		try {
-			if (!jda().awaitShutdown(Duration.ofMillis(Discord4KJSConfig.shutdownDelay))) {
+			if (!jda().awaitShutdown(Duration.ofMillis(Discord4KJSConfig.shutdownDelay.get()))) {
 				LGGR.warn("Wasn't able to disconnect nicely from Discord within {}ms, forcing shutdown immediately (this will skip any queued requests!)", Discord4KJSConfig.shutdownDelay);
 				jda().shutdownNow();
 			} else {
@@ -57,10 +58,11 @@ public class Discord4KJSWorkingThread extends Thread {
 	public void run() {
 		running = true;
 
-		JDABuilder jda = Discord4KJS.buildJDA();
-		if (jda == null) return;
-
-		Discord4KJS.connectToDiscord(jda);
+		JDABuilder jdaBuilder = Discord4KJS.buildJDA();
+		if (jdaBuilder == null || !Discord4KJS.connectToDiscord(jdaBuilder)) {
+			running = false;
+			return;
+		}
 
 
 		while (running) {

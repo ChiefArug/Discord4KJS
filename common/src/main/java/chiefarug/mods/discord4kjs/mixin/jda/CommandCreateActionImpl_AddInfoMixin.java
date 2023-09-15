@@ -33,7 +33,7 @@ import java.util.function.Predicate;
 @Mixin(value = CommandCreateActionImpl.class, remap = false)
 public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCreateAction {
 
-	@Shadow
+	@Override
 	@Info("""
    			Removes an option (parameter) from this command. 
    			
@@ -57,7 +57,7 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 			""")
 	public abstract boolean removeSubcommands(Predicate<? super SubcommandData> condition);
 
-	@Shadow
+	@Override
 	@Info("""
    			Removes a subcommand from this command with the provided name.
    			
@@ -66,7 +66,7 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 			""")
 	public abstract boolean removeSubcommandByName(String name);
 
-	@Shadow
+	@Override
 	@Info("""
    			Removes all subcommand groups that match the provided predicate.
    			
@@ -74,18 +74,16 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 			""")
 	public abstract boolean removeSubcommandGroups(Predicate<? super SubcommandGroupData> condition);
 
-	@Shadow
+	@Override
 	@Info("""
    			Removes a subcommand group from this command with the provided name.
    			
    			Note: subcommand group names are case-sensitive!
    			Returns true if any subcommand groups were removed.
 			""")
-	public boolean removeSubcommandGroupByName(String name) {
-		return CommandCreateAction.super.removeSubcommandGroupByName(name);
-	}
+	public abstract boolean removeSubcommandGroupByName(String name);
 
-	@Shadow
+	@Override
 	@Info("Returns a list of all subcommands this command has")
 	public abstract List<SubcommandData> getSubcommands();
 
@@ -140,11 +138,11 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 	@HideFromJS // Rhino hates varargs
 	public abstract CommandCreateAction addOptions(OptionData... options);
 
-	@Shadow
+	@Override
 	@HideFromJS // Rhino won't typewrap the contents, and I can't be bothered injecting to do that manually, so yeetus
 	public abstract CommandCreateAction addOptions(Collection<? extends OptionData> options);
 
-	@Shadow
+	@Override
 	@Info("""
    			Adds an option (parameter) to this command.
    			
@@ -152,7 +150,7 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 			""")//TODO: automate the autocomplete part, so you just specify a callback for that here. See CommandAutoCompleteInteractionEvent
 	public abstract CommandCreateAction addOption(OptionType type, String name, String description, boolean required, boolean autoComplete);
 
-	@Shadow
+	@Override
 	@Info("""
 			Adds an option (parameter) to this command.
    			
@@ -160,7 +158,7 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 			""")
 	public abstract CommandCreateAction addOption(OptionType type, String name, String description, boolean required);
 
-	@Shadow
+	@Override
 	@Info("""
    			Adds an optional option (parameter) to this comamnd.
    			
@@ -172,7 +170,7 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 	@HideFromJS // Rhino doesn't do varargs well //TODO: Add singular form of this because turns out, IT DOESNT EXIST
 	public abstract CommandCreateAction addSubcommands(SubcommandData... subcommands);
 
-	@Shadow
+	@Override
 	@HideFromJS // Rhino can't typewrap the contents of the collection
 	public abstract CommandCreateAction addSubcommands(Collection<? extends SubcommandData> subcommands);
 
@@ -180,7 +178,7 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 	@HideFromJS // Rhino doesn't do varargs well //TODO: Add singular form of this because turns out, IT DOESNT EXIST
 	public abstract CommandCreateAction addSubcommandGroups(SubcommandGroupData... groups);
 
-	@Shadow
+	@Override
 	@HideFromJS // Rhino can't typewrap the contents of the collection
 	public abstract CommandCreateAction addSubcommandGroups(Collection<? extends SubcommandGroupData> groups);
 
@@ -229,12 +227,10 @@ public abstract class CommandCreateActionImpl_AddInfoMixin implements CommandCre
 	@Info("Returns if this command can only be used in NSFW (age-restriced) channels")
 	public abstract boolean isNSFW();
 
-	@Shadow
+	@Override
 	@Info("""
    			Sends this command off to Discord to be registered/updated.
 			Note that this will not pause the thread and wait for it to finish, so any code executing after this will execute immediately.
 			""")
-	public void queue() {
-		CommandCreateAction.super.queue();
-	}
+	public abstract void queue(); //TODO: check if this actually works
 }
