@@ -21,6 +21,7 @@ import dev.latvian.mods.kubejs.event.Extra;
 
 import static chiefarug.mods.discord4kjs.DiscordExtras.*;
 
+// IF YOU ADD AN EVENT TO THIS PLEASE ALSO DOCUMENT THE INTENTS IT REQUIRES IN Discord4KJSConfig#intents
 public interface DiscordEvents {
 	EventGroup GROUP = EventGroup.of("DiscordEvents");
 	static void register() { GROUP.register(); }

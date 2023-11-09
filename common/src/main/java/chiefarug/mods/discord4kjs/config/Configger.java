@@ -1,8 +1,8 @@
 package chiefarug.mods.discord4kjs.config;
 
-import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
 import dev.architectury.platform.Platform;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
@@ -12,18 +12,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.lang.IllegalArgumentException;
 
 /**
  *
@@ -32,12 +26,12 @@ import java.util.stream.Collectors;
  * @author ChiefArug
  * @param name The name that should be used to describe the config, usually a modid.
  * @param location The full path of the config file.
- * @param _valueMap A new empty map.
+ * @param _valueMap A new empty map that you, the user, pass in..
  *                  Reccomended to be a LinkedHashMap so that order of insertion is preserved.
  *                  This is a workaround to making our own in a private field so this can still be a record.
- *                  Don't touch it plsthanks
+ *                  Don't do anything other than construct it plsthanks
  */
-public record Configger(String name, Path location, Map<String, ConfigValue<?>> _valueMap) {
+public record Configger(String name, Path location, Map<String, ConfigValue<?>> _valueMap, int version) {
 	private static final Logger CLOGGER = LogUtils.getLogger();
 	public static final Path MC_ROOT = Platform.getGameFolder();
 
@@ -106,13 +100,19 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 			out.write(name + "=" + writer.apply(get()));
 		}
 
-		protected void set(String value) {
+		protected String set(String value) {
 			this.value = reader.apply(value);
+			return name;
 		}
 
 		@Override
 		public V get() {
 			return value == null ? defaultValue : value;
+		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(get());
 		}
 	}
 
@@ -169,66 +169,52 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 		/**
 		 * Reads a value from a string.
 		 *
-		 * If the value is not valid you can either throw an <code>IllegalArgumentException</code>
-		 * (or some subclass like <code>NumberFormatException</code>), or return <code>null</code>.
-		 * Both will set the value to null, causing the default value to be used, but only throwing will log an error.
+		 * If the value is not valid you should return <code>null</code>.
+		 * If you are using an implementation you do not have control over
+		 * (ie {@link Integer#valueOf}) then you can wrap that
+		 * using {@link ConfigValueReader#illegalArgumentToNull} to catch any {@link IllegalArgumentExceptions} that throws.
 		 *
 		 * @param s the String to be converted to the type of the value. Will be trimmed of blank characters
 		 * @return the value that s represents, or null if no value is present
-		 * @throws IllegalArgumentException if the value is not valid
 		 */
-		T apply(String s) throws IllegalArgumentException;
+		T apply(String s);
 	}
 
 	private static final Map.Entry<String, String> EMPTY = Map.entry("","");
 
 	public void load() {
-		List<ConfigValue<?>> toWrite = new ArrayList<>(_valueMap.size());
+		boolean shouldOverwrite = false;
+		Set<ConfigValue<?>> toWrite = new HashSet<>(_valueMap.size());
 		if (Files.exists(location)) {
 			try {
 				BufferedReader reader = Files.newBufferedReader(location);
-				Set<String> foundValues = reader.lines()
-						.map(String::trim)
-						.filter(s -> !s.startsWith("#"))
-						.map(s -> {
-							String[] key_value = s.split("\\s*=\\s*");
-							if (key_value.length < 2) {
-								CLOGGER.error("Malformed config line in {} config: '{}'. Expected a '=' to seperate key and value, but none were found. Line will be ignored", name, s);
-								return EMPTY;
-							};
-							return Map.entry(key_value[0].trim(), key_value[1].trim());
-						})
-						.filter(e -> e.getKey().isBlank() || e.getValue().isBlank()) // ignore blank things.
-						.filter(e -> {
-							if (_valueMap.containsKey(e.getKey())) {
-								CLOGGER.warn("Unknown key {} for {} config at {}. Ignoring", e.getKey(), name, location);
-								return false;
-							}
-							return true;
-						})
-						.map(e -> {
-							ConfigValue<?> configValue = _valueMap.get(e.getKey());
-							configValue.set(e.getValue());
-							return e.getKey(); // Used to filter which keys we don't have
-						})
-						.collect(Collectors.toUnmodifiableSet());
+				// The first line is the version, so read that and compare against currnet version.
+				// If it returns an empty collection, then we are not overwriting.
+				if (checkVersion(reader.readLine())) {
+					shouldOverwrite = true;
+					toWrite.addAll(_valueMap.values());
+				};
 
-				String missingKeys = _valueMap.keySet().stream()
-						.filter(foundValues::contains)
-						.collect(Collectors.joining(", "));
-				if (!missingKeys.isEmpty()) {
-					CLOGGER.warn("{} config file at {} is missing required value(s): {}. Appending these with default values.", name, location, missingKeys);
+				Set<String> foundValues = readLines(reader, shouldOverwrite);
+				foundValues.retainAll(_valueMap.keySet());
+
+				if (!foundValues.isEmpty() && !shouldOverwrite) {
+					CLOGGER.warn("{} config file at {} is missing required value(s): {}. Appending these with default values.", name, location, foundValues.stream().collect(Collectors.joining(", ")));
+					toWrite.addAll(foundValues.stream().map(_valueMap::get).toList());
 				}
 			} catch (IOException e) {
 				CLOGGER.error("Failed loading {} config file from {}. {}" + location, name, e);
 			}
 		} else {
+			shouldOverwrite = true;
 			toWrite.addAll(_valueMap.values());
 		}
 		try {
-			var writer = new BufferedWriter(new FileWriter(location.toFile(), true));
-			writer.write(name + " config file");
-			writer.newLine();
+			var writer = new BufferedWriter(new FileWriter(location.toFile(), !shouldOverwrite));
+			if (shouldOverwrite) {
+				writer.write("# " + name + " config file. Version:[{" + version + "}]");
+				writer.newLine();
+			}
 			for (ConfigValue<?> value : toWrite) {
 				writer.newLine();
 				value.write(writer);
@@ -237,6 +223,38 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 		} catch (IOException e) {
 			CLOGGER.error("Failed saving {} config file to {}. {}", name, location, e);
 		}
+	}
+
+	private boolean checkVersion(String firstLine) throws IOException {
+		int versionStart = firstLine.lastIndexOf("[{") + "[{".length();
+		int versionEnd = firstLine.lastIndexOf("}]");
+		if (versionStart == -1 || versionEnd == -1 || versionStart > versionEnd) {
+			CLOGGER.error("Could not find a valid version number in {} config file at {}. We will try to recover any values from it, then overwrite.", name, location);
+			return true;
+		} else if (Integer.parseInt(firstLine, versionStart, versionEnd, 10) < version) {
+			CLOGGER.info("Found an old {} config at {}. We will try to recover any values from it, then overwrite with an updated config.", name, location);
+			return true; //TODO: Figure out why value recovery isn't working. Breakpoint ConfigValue#set?
+		}
+		return false;
+	}
+
+	@NotNull
+	private Set<String> readLines(BufferedReader reader, boolean ignoreErrors) {
+		return reader.lines()
+				.map(String::trim)
+				.filter(s -> !s.startsWith("#"))
+				.map(s -> s.split("\\s*=\\s*"))
+				.filter(sa -> Arrays.stream(sa).filter(s -> !s.isBlank()).count() >= 2)
+				.map(sa -> Map.entry(sa[0].trim(), sa[1].trim()))
+				.filter(e -> {
+					if (_valueMap.containsKey(e.getKey())) { //TODO: do we need an error message here?
+						if (!ignoreErrors) CLOGGER.warn("Unknown key {} for {} config at {}. Ignoring", e.getKey(), name, location);
+						return false;
+					}
+					return true;
+				})
+				.map(e -> _valueMap.get(e.getKey()).set(e.getValue()))
+				.collect(Collectors.toSet());
 	}
 
 	@Override

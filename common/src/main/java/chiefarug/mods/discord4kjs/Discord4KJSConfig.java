@@ -22,7 +22,7 @@ import static chiefarug.mods.discord4kjs.Discord4KJS.MODID;
 public class Discord4KJSConfig {
 
 	public static final Path CONFIG = KubeJSPaths.CONFIG.resolve("discord4kjs.properties");
-	private static Configger configger = new Configger(MODID, CONFIG, new LinkedHashMap<>(5));
+	private static Configger configger = new Configger(MODID, CONFIG, new LinkedHashMap<>(5), 0);
 
 	public static void load() {
 		configger.load();
@@ -56,12 +56,12 @@ public class Discord4KJSConfig {
 			"A list of intents used to tell Discord what events and other information we want to recieve",
 			"Note that GUILD_PRESENCES, GUILD_MEMBERS and MESSAGE_CONTENT need to also be enabled on the Discord Developer bot page as they are privleged intents",
 			"Possible values:", // TODO: say which JS events are affected here.
-			"GUILD_MEMBERS // Events which inform us about member update/leave/join of a guild. This is required to cache all members of a guild.",
-			"GUILD_MODERATION // Moderation events, such as ban/unban/audit-log.",
-			"GUILD_EMOJIS_AND_STICKERS // Custom emoji and sticker add/update/delete events.",
-			"GUILD_WEBHOOKS // Webhook events.",
-			"GUILD_INVITES // Invite events.",
-			"GUILD_VOICE_STATES // Voice state events. This is used to determine which members are connected to a voice channel.",
+			"GUILD_MEMBERS // Required to keep a cache of members. Events: DiscordEvents.nameChanged",
+			"GUILD_MODERATION // Not used in Discord4KJS yet",
+			"GUILD_EMOJIS_AND_STICKERS // Not used in Discord4KJS yet",
+			"GUILD_WEBHOOKS // Not currently used in JDA (the library Discord4KJS uses)",
+			"GUILD_INVITES // Not used in Discord4KJS yet",
+			"GUILD_VOICE_STATES // Required to check who is connected to a voice channel. Otherwise not used in Discord4KJS yet",
 			"GUILD_PRESENCES // Presence updates. This is used to lazy load members and update user properties such as name/avatar. This is a very heavy intent! Presence updates are 99% of traffic the bot will receive. To get user update events you should consider using GUILD_MEMBERS instead. This intent is primarily used to track Member.getOnlineStatus() and Member.getActivities().",
 			"GUILD_MESSAGES // Message events from text channels in guilds.",
 			"GUILD_MESSAGE_REACTIONS // Message reaction events in guilds.",
