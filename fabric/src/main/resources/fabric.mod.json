@@ -10,7 +10,7 @@
   "contact": {
     "homepage": "//TODO"
   },
-  "license": "LGPL-2.0",
+  "license": "MIT",
   "icon": "pack.png",
   "environment": "*",
   "entrypoints": {
