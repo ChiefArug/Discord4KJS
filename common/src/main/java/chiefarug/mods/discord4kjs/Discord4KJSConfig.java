@@ -18,7 +18,6 @@ import java.util.LinkedHashMap;
 import static chiefarug.mods.discord4kjs.Discord4KJS.LGGR;
 import static chiefarug.mods.discord4kjs.Discord4KJS.MODID;
 
-//TODO: actually implement this
 public class Discord4KJSConfig {
 
 	public static final Path CONFIG = KubeJSPaths.CONFIG.resolve("discord4kjs.properties");

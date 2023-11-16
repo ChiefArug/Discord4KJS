@@ -289,7 +289,7 @@ public class EventListeners extends ListenerAdapter implements IEventManager {
 			if (DiscordWrapper.defaultGuild != null)
 				DiscordWrapper.defaultGuild = event.getGuild();
 			else if (event.getJDA().getGuilds().size() > 1)
-				LGGR.warn("Discord4KJS is connected to more than one Discord Server! You should disable autofillDefaultGuild in {} to prevent the default guild changing between restarts", (Object) null/*TODO config file location*/);
+				LGGR.warn("Discord4KJS is connected to more than one Discord Server! You should disable autofillDefaultGuild in {} to prevent the default guild changing between restarts", Discord4KJSConfig.CONFIG);
 	}
 
 	public void onGuildJoin(GuildJoinEvent event) {
