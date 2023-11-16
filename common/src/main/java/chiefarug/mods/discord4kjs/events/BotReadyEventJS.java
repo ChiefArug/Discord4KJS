@@ -1,10 +1,9 @@
 package chiefarug.mods.discord4kjs.events;
 
-import chiefarug.mods.discord4kjs.DiscordEvents;
 import dev.latvian.mods.kubejs.typings.Info;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 
-public class BotReadyEventJS extends DiscordEventJS {
+public class BotReadyEventJS extends WrappedJDAEventJS {
 
 	private final int connectedGuilds;
 	private final int disconnectedGuilds;

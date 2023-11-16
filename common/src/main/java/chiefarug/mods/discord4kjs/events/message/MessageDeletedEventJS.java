@@ -1,14 +1,12 @@
 package chiefarug.mods.discord4kjs.events.message;
 
-import chiefarug.mods.discord4kjs.events.DiscordEventJS;
+import chiefarug.mods.discord4kjs.events.WrappedJDAEventJS;
 import dev.latvian.mods.kubejs.typings.Info;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
-import net.dv8tion.jda.internal.utils.Helpers;
 
-public class MessageDeletedEventJS extends DiscordEventJS {
+public class MessageDeletedEventJS extends WrappedJDAEventJS {
 
 	private final String messageId;
 
