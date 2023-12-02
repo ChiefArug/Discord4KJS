@@ -116,7 +116,7 @@ public class EventListeners extends ListenerAdapter implements IEventManager {
 		}
 	}
 
-	public void onReady(ReadyEvent event) { postWrappedEvent(READY, event); }
+	public void onReady(ReadyEvent event) { postWrappedEvent(READY, event); } //todo: add global command registry event firing here, maybe
 
 //	@Override
 //	public void onSessionInvalidate(SessionInvalidateEvent event) {
@@ -290,6 +290,7 @@ public class EventListeners extends ListenerAdapter implements IEventManager {
 				DiscordWrapper.defaultGuild = event.getGuild();
 			else if (event.getJDA().getGuilds().size() > 1)
 				LGGR.warn("Discord4KJS is connected to more than one Discord Server! You should disable autofillDefaultGuild in {} to prevent the default guild changing between restarts", Discord4KJSConfig.CONFIG);
+			// TODO: add command registry event firing here for guild commands
 	}
 
 	public void onGuildJoin(GuildJoinEvent event) {

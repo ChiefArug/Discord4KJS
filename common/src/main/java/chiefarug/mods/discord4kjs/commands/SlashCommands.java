@@ -1,7 +1,5 @@
 package chiefarug.mods.discord4kjs.commands;
 
-import chiefarug.mods.discord4kjs.Discord4KJS;
-import chiefarug.mods.discord4kjs.DiscordWrapper;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -14,8 +12,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.latvian.mods.kubejs.event.EventJS;
-import dev.latvian.mods.kubejs.event.EventResult;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -29,31 +25,34 @@ import java.util.function.Function;
 
 public class SlashCommands {
 
-	record SlashCommandData(LiteralCommandNode<SlashCommandInteraction> command, String description) {
+	record SlashCommandDataJS(LiteralCommandNode<SlashCommandInteraction> command, String description) {
 		String name() {
 			return command.getName();
 		}
 
 		Collection<ArgumentCommandNode<SlashCommandInteraction, ?>> arguments() {
-			return getArguments(command);
+			return getArgumentsAndVerifyLevels(command);
 		}
 
 		Collection<LiteralCommandNode<SlashCommandInteraction>> subCommmands() {
-			return getSubCommands(command);
+			return getDirectSubCommands(command);
 		}
 
 		CommandData build() {
 			var builder = Commands.slash(name(), description());
 			for (ArgumentCommandNode<SlashCommandInteraction, ?> argument : arguments()) {
-				builder.addOption()
+//				builder.addOption()
 			}
+			return null;
+		}
+
+		private static void addArgument(SlashCommandData builder, ArgumentCommandNode<SlashCommandInteraction, ?> arg) {
+//			builder.addOption(argumentToOption(arg.getType()))
 		}
 	}
 
 	public final CommandDispatcher<SlashCommandInteraction> dispatcher = new CommandDispatcher<>();
 
-	final List<SlashCommandData> globalCommands = new ArrayList<>();
-	final List<SlashCommandData> guildCommands = new ArrayList<>();
 
 	LiteralCommandNode<SlashCommandInteraction> registerAndCheck(LiteralArgumentBuilder<SlashCommandInteraction> command) {
 		var builtCommand = command.build();
@@ -77,14 +76,29 @@ public class SlashCommands {
 		return maxDepth;
 	}
 
-	static List<ArgumentCommandNode<SlashCommandInteraction, ?>> getArguments(LiteralCommandNode<SlashCommandInteraction> command) {
-		return command.getChildren().stream()
-					.filter(ArgumentCommandNode.class::isInstance)
-					.map((Function<CommandNode<SlashCommandInteraction>, ArgumentCommandNode<SlashCommandInteraction,?>>) (node -> (ArgumentCommandNode<SlashCommandInteraction, ?>) node))
-					.toList();
+	static List<ArgumentCommandNode<SlashCommandInteraction, ?>> getArgumentsAndVerifyLevels(LiteralCommandNode<SlashCommandInteraction> command) {
+		List<ArgumentCommandNode<SlashCommandInteraction, ?>> args = new ArrayList<>();
+
+		Boolean isSubcommand = null;
+		for (CommandNode<SlashCommandInteraction> node : command.getChildren()) {
+			if (node instanceof ArgumentCommandNode<SlashCommandInteraction,?> arg) {
+				if (isSubcommand != null) {
+					if (isSubcommand) throw new IllegalArgumentException("Cannot have subcommands and arguments on the same level for a Discord command!");
+					else throw new IllegalArgumentException("Cannot have multiple arguments on the same level for a Discord command!");
+				}
+				isSubcommand = false;
+				args.add(arg);
+			} else if (node instanceof LiteralCommandNode<SlashCommandInteraction> subcommand) {
+				if (isSubcommand != null && !isSubcommand) throw new IllegalArgumentException("Cannot have subcommands and arguments on the same level for a Discord command!");
+				isSubcommand = true;
+			}
+		}
+
+		if (isSubcommand == null || isSubcommand) return List.of();
+		return args;
 	}
 
-	static Collection<LiteralCommandNode<SlashCommandInteraction>> getSubCommands(LiteralCommandNode<SlashCommandInteraction> command) {
+	static Collection<LiteralCommandNode<SlashCommandInteraction>> getDirectSubCommands(LiteralCommandNode<SlashCommandInteraction> command) {
 		return command.getChildren().stream()
 				.filter(LiteralCommandNode.class::isInstance)
 				.map((Function<CommandNode<SlashCommandInteraction>, LiteralCommandNode<SlashCommandInteraction>>) (node -> (LiteralCommandNode<SlashCommandInteraction>) node))
@@ -92,27 +106,7 @@ public class SlashCommands {
 	}
 
 
-	static OptionType argumentToOption(ArgumentType<?> arg) {
-		if (arg instanceof IntegerArgumentType)
-			return OptionType.INTEGER;
-		else if (arg instanceof DoubleArgumentType || arg instanceof FloatArgumentType || arg instanceof LongArgumentType)
-			return OptionType.NUMBER;
-		else if (arg instanceof BoolArgumentType)
-			return OptionType.BOOLEAN;
-		else if (arg instanceof StringArgumentType)
-			return OptionType.STRING;
-		else if (arg instanceof UserArgumentType)
-			return OptionType.USER;
-		else if (arg instanceof RoleArgumentType)
-			return OptionType.ROLE;
-		else if (arg instanceof ChannelArgumentType)
-			return OptionType.CHANNEL;
-		else if (arg instanceof MentionableArgumentType)
-			return OptionType.MENTIONABLE;
-//		else if (arg instanceof AttachmentArgumentType) //TODO: Attachments, maybe
-//			return OptionType.ATTACHMENT;
-		return OptionType.STRING; // it will have a string form from ArgumentType#parse
-	}
+
 
 
 }
