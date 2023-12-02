@@ -1,15 +1,20 @@
 package chiefarug.mods.discord4kjs.events.message;
 
 import chiefarug.mods.discord4kjs.Discord4KJS;
-import chiefarug.mods.discord4kjs.events.WrappedJDAEventJS;
+import chiefarug.mods.discord4kjs.events.DiscordEventJS;
 import dev.latvian.mods.kubejs.typings.Info;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 
-public class ContentlessMessageEventJS extends WrappedJDAEventJS {
+import static chiefarug.mods.discord4kjs.Discord4KJS.jda;
+
+public class ContentlessMessageEventJS extends DiscordEventJS {
 
 	protected final String messageId;
 	protected final Channel channel;

@@ -1,14 +1,15 @@
 package chiefarug.mods.discord4kjs.events.message;
 
-import chiefarug.mods.discord4kjs.events.WrappedJDAEventJS;
+import chiefarug.mods.discord4kjs.events.DiscordEventJS;
 import dev.latvian.mods.kubejs.typings.Info;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent;
 
 import java.util.List;
 
-public class MessageBulkDeletedEventJS extends WrappedJDAEventJS {
+public class MessageBulkDeletedEventJS extends DiscordEventJS {
 
 	private final List<String> messageIds;
 

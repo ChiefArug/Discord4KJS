@@ -2,11 +2,12 @@ package chiefarug.mods.discord4kjs.events;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.user.GenericUserEvent;
 import net.dv8tion.jda.api.events.user.update.GenericUserUpdateEvent;
 
 import static chiefarug.mods.discord4kjs.DiscordTypeWrappers.tryMember;
 
-public abstract class UserUpdateEventJS<T> extends WrappedJDAEventJS {
+public abstract class UserUpdateEventJS<T> extends DiscordEventJS {
 
 	private final User user;
 	protected final T oldValue;

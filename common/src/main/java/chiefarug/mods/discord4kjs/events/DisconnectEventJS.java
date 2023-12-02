@@ -1,11 +1,12 @@
 package chiefarug.mods.discord4kjs.events;
 
+import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.kubejs.typings.Info;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.requests.CloseCode;
 import org.jetbrains.annotations.Nullable;
 
-public class DisconnectEventJS extends WrappedJDAEventJS {
+public class DisconnectEventJS extends DiscordEventJS {
 
 	@Nullable
 	private final CloseCode disconnectReason;

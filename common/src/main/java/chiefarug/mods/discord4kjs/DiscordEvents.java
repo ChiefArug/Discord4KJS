@@ -1,9 +1,9 @@
 package chiefarug.mods.discord4kjs;
 
-import chiefarug.mods.discord4kjs.commands.SlashCommandRegistryEventJS;
 import chiefarug.mods.discord4kjs.events.BotReadyEventJS;
 import chiefarug.mods.discord4kjs.events.DisconnectEventJS;
-import chiefarug.mods.discord4kjs.events.WrappedJDAEventJS;
+import chiefarug.mods.discord4kjs.events.DiscordEventJS;
+import chiefarug.mods.discord4kjs.events.channel.ChanelMovedEventJS;
 import chiefarug.mods.discord4kjs.events.channel.ChannelCreatedEventJS;
 import chiefarug.mods.discord4kjs.events.channel.ChannelDeletedEventJS;
 import chiefarug.mods.discord4kjs.events.channel.ChannelUpdatedEventJS;
@@ -17,6 +17,7 @@ import chiefarug.mods.discord4kjs.events.message.ReactionAddedEventJS;
 import chiefarug.mods.discord4kjs.events.message.ReactionRemovedEventJS;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
+import dev.latvian.mods.kubejs.event.Extra;
 
 import static chiefarug.mods.discord4kjs.DiscordExtras.*;
 
@@ -25,7 +26,7 @@ public interface DiscordEvents {
 	EventGroup GROUP = EventGroup.of("DiscordEvents");
 	static void register() { GROUP.register(); }
 
-	static EventHandler event(String name, Class<? extends WrappedJDAEventJS> clss) {
+	static EventHandler event(String name, Class<? extends DiscordEventJS> clss) {
 		return GROUP.server(name, () -> clss);
 	}
 
@@ -53,9 +54,7 @@ public interface DiscordEvents {
 	EventHandler CHANNEL_DELETED = event("channelDeleted", ChannelDeletedEventJS.class).extra(GUILD);
 	EventHandler CHANNEL_UPDATED = event("channelUpdated", ChannelUpdatedEventJS.class).extra(GUILD);
 	// Thread events
-	//	EventHandler THREAD_REVEALED = event("threadRevealed", ThreadRevealedEventJS.class);
-	//	EventHandler THREAD_HIDDEN = event("threadHidden", ThreadHiddenEventJS.class);
+//	EventHandler THREAD_REVEALED = event("threadRevealed", ThreadRevealedEventJS.class);
+//	EventHandler THREAD_HIDDEN = event("threadHidden", ThreadHiddenEventJS.class);
 
-	// Slash Command Events
-	EventHandler SLASH_COMMAND_REGISTRY = GROUP.server("slashCommandRegistry", () -> SlashCommandRegistryEventJS.class);
 }
