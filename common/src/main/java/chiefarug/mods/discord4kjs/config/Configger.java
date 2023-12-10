@@ -26,10 +26,11 @@ import java.lang.IllegalArgumentException;
  * @param name The name that should be used to describe the config, usually a modid.
  * @param location The full path of the config file.
  * @param _valueMap A new empty map that you, the user, pass in..
- *                  Reccomended to be a LinkedHashMap so that order of insertion is preserved.
+ *                  Recommended to be a LinkedHashMap so that order of insertion is preserved.
  *                  This is a workaround to making our own in a private field so this can still be a record.
- *                  Don't do anything other than construct it plsthanks
+ *                  Don't do anything other than construct it pls & thanks
  */
+@SuppressWarnings("unused")
 public record Configger(String name, Path location, Map<String, ConfigValue<?>> _valueMap, int version) {
 	private static final Logger CLOGGER = LogUtils.getLogger();
 	public static final Path MC_ROOT = Platform.getGameFolder();
@@ -146,7 +147,7 @@ public record Configger(String name, Path location, Map<String, ConfigValue<?>> 
 				try {
 					return inner.apply(s);
 				} catch (IllegalArgumentException _ignored) {
-					CLOGGER.error("Unkown/invalid config value: {}", s); // We don't have enough context here to say more
+					CLOGGER.error("Unknown/invalid config value: {}", s); // We don't have enough context here to say more
 					return null;
 				}
 			};
