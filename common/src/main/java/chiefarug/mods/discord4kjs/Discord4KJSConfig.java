@@ -29,7 +29,8 @@ public class Discord4KJSConfig {
 
 	public static ConfigValue<Boolean> blockThread = configger.booleanValue("blockThread", false,
 			"If the main thread is allowed to be blocked to wait for requests to discord to complete.",
-			"Disabling this will cause some features to be disabled, but will also result in a more stable experience"
+			"Disabling this will cause some features to be disabled, but will also result in a more stable experience",
+			"Note that by blocked I mean *everything else will stop*. Not recommended for general use."
 	);
 
 	public static ConfigValue<Boolean> autofillDefaultGuild = configger.booleanValue("autofillDefaultGuild", true,
