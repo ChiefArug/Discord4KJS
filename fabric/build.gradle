@@ -26,6 +26,16 @@ configurations.all {
   }
 }
 
+repositories {
+    maven {
+        name 'CurseMaven'
+        url 'https://cursemaven.com'
+        content {
+            includeGroup 'curse.maven'
+        }
+    }
+}
+
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
@@ -36,6 +46,8 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
     modImplementation("dev.latvian.mods:kubejs-fabric:${rootProject.kubejs_version}")
+
+    modRuntimeOnly "curse.maven:probejs-585406:4842666"
 
     implementation("net.dv8tion:JDA:${jda_version}") {
         exclude module: 'opus-java'
